@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-
+#include "funcoesFornecidas.h"
 
 void binarioNaTela(char *nomeArquivoBinario) { /* Você não precisa entender o código dessa função. */
 
@@ -29,6 +27,7 @@ void binarioNaTela(char *nomeArquivoBinario) { /* Você não precisa entender o 
 	free(mb);
 	fclose(fs);
 }
+
 
 void scan_quote_string(char *str) {
 
@@ -64,8 +63,3 @@ void scan_quote_string(char *str) {
 		strcpy(str, "");
 	}
 }
-
-
-
-
-
