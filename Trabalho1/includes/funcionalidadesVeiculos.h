@@ -9,7 +9,7 @@
     #define INSERT_INTO_VEICULOS 7
 
     void createTableVeiculos(char *arquivoEntrada, char *arquivoSaida);
-    void selectFromVeiculos(char *arquivoEntrada, char *arquivoSaida);
+    void selectFromVeiculos(char *arquivoEntrada);
     void selectWhereVeiculos(char *arquivoEntrada, char *arquivoSaida);
     void insertIntoVeiculos(char *arquivoEntrada, char *arquivoSaida);
 

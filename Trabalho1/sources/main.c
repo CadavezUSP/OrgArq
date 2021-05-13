@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
             createTableLinhas(arquivoEntrada, arquivoSaida);
             break;
         case SELECT_FROM_VEICULOS:
-            selectFromVeiculos(arquivoEntrada, arquivoSaida);
+            selectFromVeiculos(arquivoEntrada);
             break;
         case SELECT_FROM_LINHAS:
             selectFromLinhas(arquivoEntrada, arquivoSaida);

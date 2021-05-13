@@ -19,9 +19,9 @@ typedef struct RegistroLinha
     int codLinha;
     char aceitaCartao; // S, N, F
     int tamanhoNome;
-    char *nomeLinha;
+    char nomeLinha[100];
     int tamanhoCor;
-    char* corLinha;
+    char corLinha[100];
 }RegistroLinha;
 
 
@@ -30,12 +30,12 @@ void createTableLinhas(char *arquivoEntrada, char *arquivoSaida) {
 }
 
 
-void selectFromLinhas(char *arquivoEntrada, char *arquivoSaida) {
+void selectFromLinhas(char *arquivoEntrada, char *arquivoSaida) {// Cadavez
 
 }
 
 
-void selectWhereLinhas(char *arquivoEntrada, char *arquivoSaida) {
+void selectWhereLinhas(char *arquivoEntrada, char *arquivoSaida) {// Cadavez
 
 }
 
