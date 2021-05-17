@@ -1,4 +1,78 @@
-#include "funcoesFornecidas.h"
+#include "util.h"
+
+
+char* VerMes(int num){
+    char *mes = malloc(15*sizeof(char));
+    switch (num)
+    {
+        case 1:
+            mes  = "janeiro";
+            break;
+        case 2:
+            mes  = "fevereiro";
+            break;
+        case 3:
+            mes  = "março";
+            break;
+        case 4:
+            mes  = "abril";
+            break;
+        case 5:
+            mes  = "maio";
+            break;
+        case 6:
+            mes  = "junho";
+            break;
+        case 7:
+            mes  = "julho";
+            break;
+        case 8:
+            mes  = "agosto";
+            break;
+        case 9:
+            mes  = "setembro";
+            break;
+        case 10:
+            mes  = "outubro";
+            break;
+        case 11:
+            mes  = "novembro";
+            break;
+        case 12:
+            mes  = "dezembro";
+            break;
+
+        default:
+            mes = NULL;
+            break;
+    }
+    return mes;
+}
+
+/*
+	Imprime a mensagem "Falha no processamento do arquivo."
+	@param stream fluxo no qual a mensagem será impressa
+*/
+void imprimeMensagemErro(FILE *stream) {
+	fprintf(stream, "Falha no processamento do arquivo.");
+}
+
+/*
+    Verifica se o fluxo passado por parâmetro chegou ao seu fim
+    @param arquivoBIN: fluxo do arquivo binário a ser verificado
+    @return int 1 se verdadeiro | 0 se falso
+*/
+int fimDoArquivoBIN(FILE *arquivoBIN) {
+
+    char byteAtual;
+    fread(&byteAtual, 1, 1, arquivoBIN);
+
+    if (feof(arquivoBIN)) 
+        return 1; 
+    
+    fseek(arquivoBIN, -1, SEEK_CUR); // voltamos um byte (pois "comemos" um char válido)
+    return 0;
+}
 
 void binarioNaTela(char *nomeArquivoBinario) { /* Você não precisa entender o código dessa função. */
 
@@ -27,7 +101,6 @@ void binarioNaTela(char *nomeArquivoBinario) { /* Você não precisa entender o 
 	free(mb);
 	fclose(fs);
 }
-
 
 void scan_quote_string(char *str) {
 

@@ -10,3 +10,6 @@ compile:
 
 run:
 	@./$(EXE)
+
+zip:
+	@zip -r Trabalho1 $(SRC) $(INC) Makefile
