@@ -11,7 +11,6 @@
 
     #define DELIMITADOR_CAMPO ','
     #define STR_TOK_DELIM ","
-    #define INDICADOR_CAMPO_REMOVIDO '*'
 
     #include <stdio.h>
     #include <stdlib.h>
@@ -19,10 +18,11 @@
     #include <ctype.h>
 
     bool fimDoArquivoCSV(FILE *stream);
-    char **leCabecalhoCSV(FILE *stream);
-    int leIntCSV(FILE *stream);
-    long long leLongLongCSV(FILE *stream);
-    char leCharCSV(FILE *stream);
-    char *leStringCSV(FILE *stream);
+    bool registroDoCSVEhRemovido(FILE *arquivoCSV);
+    char **leDescricoesCabecalhoCSV(FILE *stream);
+    int leIntDoCSV(FILE *stream);
+    long long leLongLongDoCSV(FILE *stream);
+    char leCharDoCSV(FILE *stream);
+    char *leStringDoCSV(FILE *stream);
 
 #endif

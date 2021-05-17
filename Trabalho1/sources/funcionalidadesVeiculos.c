@@ -1,86 +1,51 @@
 #include "funcionalidadesVeiculos.h"
-#include <stdlib.h>
-#include <stdio.h>
 
-
-typedef struct CabecalhoVeiculo //cabecalho soh na hr de abrir e fechar 
-{
-    char status;
-    long long int byteProxReg; //ftell
-    int nroRegistros; // complementar de Removidos
-    int nroRegRemovidos; // complementar de registros
-    char descrevePrefixo[18];
-    char descreveData [35];
-    char descreveLugares[42];
-    char descreveLinha[26];
-    char descreveModelo[17];
-    char descreveCategoria[20];
-}CabecalhoVeiculo;
-
-typedef struct RegistroVeiculo
-{
-    char removido; // eh um char!! '0' ou '1'
-    int tamanhoRegistro;
-    char prefixo[5]; // nao pode assumir valor nulo e nem se repetir
-    char data[10]; // AAAA - MM - DD
-    int quantidadeLugares;
-    int codLinha;
-    int tamanhoModelo;
-    char modelo[100];
-    int tamanhoCategoria;
-    char categoria[100];
-}RegistroVeiculo;
-
-char* VerMes(int num){
-    char *mes = malloc(15*sizeof(char));
-    switch (num)
-    {
-        case 1:
-            mes  = "janeiro";
-            break;
-        case 2:
-            mes  = "fevereiro";
-            break;
-        case 3:
-            mes  = "março";
-            break;
-        case 4:
-            mes  = "abril";
-            break;
-        case 5:
-            mes  = "maio";
-            break;
-        case 6:
-            mes  = "junho";
-            break;
-        case 7:
-            mes  = "julho";
-            break;
-        case 8:
-            mes  = "agosto";
-            break;
-        case 9:
-            mes  = "setembro";
-            break;
-        case 10:
-            mes  = "outubro";
-            break;
-        case 11:
-            mes  = "novembro";
-            break;
-        case 12:
-            mes  = "dezembro";
-            break;
-
-        default:
-            mes = NULL;
-            break;
-    }
-    return mes;
-}
-
+/*
+    Cria um arquivo binário com dados contidos em um arquivo csv
+    @param arquivoEntrada nome do arquivo csv de onde os dados serão estraídos
+    @param arquivoSaida nome do arquivo binário no qual os dados serão escritos 
+*/
 void createTableVeiculos(char *arquivoEntrada, char *arquivoSaida) {
+    
+    // Abrindo o arquivo CSV para leitura e o arquivo binário para escrita:
+    FILE *arquivoCSV = fopen(arquivoEntrada, "r");
+    FILE *arquivoBIN = fopen(arquivoSaida, "wb");
 
+    // Abortando a funcionalidade se ocorrer algum erro com a abertura dos arquivos:
+    if (arquivoCSV == NULL || arquivoBIN == NULL) {
+        imprimeMensagemErro(stdout);
+        return;
+    }
+
+    // Obtendo os campos do cabeçalho do arquivo CSV e escrevendo-os no arquivo binário:
+    CabecalhoVeiculo *cabecalho = carregaCabecalhoVeiculoDoCSV(arquivoCSV);
+    escreveCabecalhoVeiculoNoBIN(cabecalho, arquivoBIN);
+
+    // Obtendo os registros de dados do arquivo CSV e escrevendo-os no arquivo binário:
+    while (!fimDoArquivoCSV(arquivoCSV)) {
+        RegistroVeiculo *registroAtual = carregaRegistroVeiculoDoCSV(arquivoCSV);
+        if (registroAtual->removido == '0') // se o registro estiver removido
+            cabecalho->nroRegRemovidos += 1;
+        else
+            cabecalho->nroRegistros += 1;
+        escreveRegistroVeiculoNoBIN(registroAtual, arquivoBIN);
+        free(registroAtual);
+    }
+
+    // Atualizando o arquivo de cabeçalho:
+    cabecalho->status = '1';
+    cabecalho->byteProxReg = ftell(arquivoBIN);
+    escreveCabecalhoVeiculoNoBIN(cabecalho, arquivoBIN);
+
+    // Fechando os arquivos
+    fclose(arquivoCSV);
+    fclose(arquivoBIN);
+
+    // Imprimindo o resultado do binário na tela:
+    binarioNaTela(arquivoSaida);
+
+    // Liberando memória do cabeçalho:
+    free(cabecalho);
 }
 
 /*Funcao: selectFromVeiculos
@@ -91,7 +56,7 @@ Variáveis: arquivoBin = arquivo binario que sera aberto para a leitura
            fimDeArquivo = verifica se é o fim do arquivo
 */
 void selectFromVeiculos(char *arquivoEntrada) { //Cadavez
-    FILE* arquivoBin = fopen(arquivoEntrada, "rb");
+/*    FILE* arquivoBin = fopen(arquivoEntrada, "rb");
     RegistroVeiculo *Reg;
     char fimDeArquivo=0;
     fseek(arquivoBin, sizeof(CabecalhoVeiculo), SEEK_SET);
@@ -157,16 +122,13 @@ void selectFromVeiculos(char *arquivoEntrada) { //Cadavez
         fread(&fimDeArquivo, sizeof(char), 1, SEEK_CUR);
         printf("\n");
         free (Reg);
-    }
-    
+    }*/
 }
 
-
-void selectWhereVeiculos(char *arquivoEntrada, char *arquivoSaida) {//Cadavez
+void selectWhereVeiculos(char *arquivoEntrada, char *campo, char *valor) {//Cadavez
 
 }
 
-
-void insertIntoVeiculos(char *arquivoEntrada, char *arquivoSaida) {
+void insertIntoVeiculos(char *arquivoEntrada, int numeroRegistros) {
 
 }

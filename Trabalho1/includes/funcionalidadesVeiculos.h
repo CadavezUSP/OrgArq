@@ -2,6 +2,9 @@
     #define __FUNCIONALIDADES_VEICULOS_H__
 
     #include <stdio.h>
+    #include "registrosVeiculos.h"
+    #include "leitorCSV.h"
+    #include "util.h"
 
     #define CREATE_TABLE_VEICULOS 1
     #define SELECT_FROM_VEICULOS 3
@@ -10,7 +13,7 @@
 
     void createTableVeiculos(char *arquivoEntrada, char *arquivoSaida);
     void selectFromVeiculos(char *arquivoEntrada);
-    void selectWhereVeiculos(char *arquivoEntrada, char *arquivoSaida);
-    void insertIntoVeiculos(char *arquivoEntrada, char *arquivoSaida);
+    void selectWhereVeiculos(char *arquivoEntrada, char *campo, char *valor);
+    void insertIntoVeiculos(char *arquivoEntrada, int numeroRegistros);
 
 #endif

@@ -7,39 +7,58 @@
 int main(int argc, char *argv[]) {
 
     int funcionalidade = 0;
-    char arquivoEntrada[12];
-    char arquivoSaida[12];
-
-    scanf("%d %s %s", &funcionalidade, arquivoEntrada, arquivoSaida);
+    scanf("%d", &funcionalidade);
     
-    switch (funcionalidade) {
-        case CREATE_TABLE_VEICULOS:
-            createTableVeiculos(arquivoEntrada, arquivoSaida);
-            break;
-        case CREATE_TABLE_LINHAS:
-            createTableLinhas(arquivoEntrada, arquivoSaida);
-            break;
-        case SELECT_FROM_VEICULOS:
-            selectFromVeiculos(arquivoEntrada);
-            break;
-        case SELECT_FROM_LINHAS:
-            selectFromLinhas(arquivoEntrada, arquivoSaida);
-            break;
-        case SELECT_WHERE_VEICULOS:
-            selectWhereVeiculos(arquivoEntrada, arquivoSaida);
-            break;
-        case SELECT_WHERE_LINHAS:
-            selectWhereLinhas(arquivoEntrada, arquivoSaida);
-            break;
-        case INSERT_INTO_VEICULOS:
-            insertIntoVeiculos(arquivoEntrada, arquivoSaida);
-            break;
-        case INSERT_INTO_LINHAS:
-            insertIntoLinhas(arquivoEntrada, arquivoSaida);
-            break;
-        default:
-            fprintf(stderr, "Funcionalidade desconhecida!\n");
+    if (funcionalidade == CREATE_TABLE_VEICULOS) {
+        char arquivoEntrada[100];
+        char arquivoSaida[100];
+        scanf("%s %s", arquivoEntrada, arquivoSaida);
+        createTableVeiculos(arquivoEntrada, arquivoSaida);
     }
+    else if (funcionalidade == CREATE_TABLE_LINHAS) {
+        char arquivoEntrada[100];
+        char arquivoSaida[100];
+        scanf("%s %s", arquivoEntrada, arquivoSaida);
+        createTableLinhas(arquivoEntrada, arquivoSaida);
+    }
+    else if (funcionalidade == SELECT_FROM_VEICULOS) {
+        char arquivoEntrada[100];
+        scanf("%s", arquivoEntrada);
+        selectFromVeiculos(arquivoEntrada);
+    }
+    else if (funcionalidade == SELECT_FROM_LINHAS) {
+        char arquivoEntrada[100];
+        scanf("%s", arquivoEntrada);
+        selectFromLinhas(arquivoEntrada);
+    }
+    else if (funcionalidade == SELECT_WHERE_VEICULOS) {
+        char arquivoEntrada[100];
+        char nomeCampo[100];
+        char valor[100];
+        scanf("%s %s %s", arquivoEntrada, nomeCampo, valor);
+        selectWhereVeiculos(arquivoEntrada, nomeCampo, valor);
+    }
+    else if (funcionalidade == SELECT_WHERE_LINHAS) {
+        char arquivoEntrada[100];
+        char nomeCampo[100];
+        char valor[100];
+        scanf("%s %s %s", arquivoEntrada, nomeCampo, valor);
+        selectWhereLinhas(arquivoEntrada, nomeCampo, valor);
+    }
+    else if (funcionalidade ==  INSERT_INTO_VEICULOS) {
+        char arquivoEntrada[100];
+        int numeroRegistros;
+        scanf("%s %d", arquivoEntrada, &numeroRegistros);
+        insertIntoVeiculos(arquivoEntrada, numeroRegistros);
+    }
+    else if(funcionalidade == INSERT_INTO_LINHAS) {
+        char arquivoEntrada[100];
+        int numeroRegistros;
+        scanf("%s %d", arquivoEntrada, &numeroRegistros);
+        insertIntoLinhas(arquivoEntrada, numeroRegistros);
+    }
+    else 
+        imprimeMensagemErro(stdout);
 
     return 0;
 }
