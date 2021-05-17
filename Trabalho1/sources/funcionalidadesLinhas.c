@@ -41,11 +41,11 @@ void createTableLinhas(char *arquivoEntrada, char *arquivoSaida) {
     fclose(arquivoCSV);
     fclose(arquivoBIN);
 
-    // Imprimindo o resultado do binário na tela:
-    binarioNaTela(arquivoSaida);
-
     // Liberando memória do cabeçalho:
     free(cabecalho);
+    
+    // Imprimindo o resultado do binário na tela:
+    binarioNaTela(arquivoSaida);
 }
 
 
@@ -59,6 +59,57 @@ void selectWhereLinhas(char *arquivoEntrada, char *campo, char *valor) {// Cadav
 }
 
 
+/*
+    Insere um conjunto de registros em um arquivo binário com dados lidos da entrada padrão 
+    @param arquivoEntrada nome do arquivo binário em que os registros serão inseridos 
+    @param numeroRegistros numero de registros que serão inseridos
+*/
 void insertIntoLinhas(char *arquivoEntrada, int numeroRegistros) {
 
+    // Abrindo o arquivo binário para leitura e escrita:
+    FILE *arquivoBIN = fopen(arquivoEntrada, "r+b");
+
+    // Abortando a funcionalidade se o arquivo de entrada não existir:
+    if (arquivoBIN == NULL) {
+        imprimeMensagemErro(stdout);
+        return;
+    }
+
+    // Carregando o registro de cabeçalho do arquivo binário para a memória:
+    CabecalhoLinha *cabecalho = carregaCabecalhoLinhaDoBIN(arquivoBIN);
+
+    // Abortando a funcionalidade se o arquivo de entrada estiver inconsistente:
+    if (cabecalho->status == '0') {
+        imprimeMensagemErro(stdout);
+        fclose(arquivoBIN);
+        free(cabecalho);
+        return;
+    }
+
+    // Atualizando o registro de cabeçalho no arquivo binário:
+    cabecalho->status = '0';
+    escreveCabecalhoLinhaNoBIN(cabecalho, arquivoBIN);
+
+    // Posicionando o cursor no fim do arquivo:
+    fseek(arquivoBIN, 0, SEEK_END);
+
+    // Inserindo os registros lidos da entrada padrão:
+    for (int i = 0; i < numeroRegistros; i++) {
+        RegistroLinha *registroAtual = carregaRegistroLinhaDaStdin();
+        escreveRegistroLinhaNoBIN(registroAtual, arquivoBIN);
+        cabecalho->nroRegistros += 1;
+        free(registroAtual);
+    }
+    
+    // Atualizando o registro de cabeçalho no arquivo binário:
+    cabecalho->status = '1';
+    cabecalho->byteProxReg = ftell(arquivoBIN);
+    escreveCabecalhoLinhaNoBIN(cabecalho, arquivoBIN);
+
+    // Fechando arquivo binário e liberando memória alocada:
+    fclose(arquivoBIN);
+    free(cabecalho);
+
+    // Imprimindo o resultado do binário na tela:
+    binarioNaTela(arquivoEntrada);
 }

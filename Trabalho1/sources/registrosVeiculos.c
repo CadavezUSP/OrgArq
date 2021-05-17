@@ -36,48 +36,6 @@ CabecalhoVeiculo *carregaCabecalhoVeiculoDoCSV(FILE *arquivoCSV) {
 }
 
 /*
-    Lê o prefixo de um registro de dados de um arquivo csv
-    @param arquivoCSV: fluxo do arquivo csv a partir do qual o prefixo será lido 
-    @return char* prefixo lido 
-*/
-char *lePrefixoDoCSV(FILE *arquivoCSV) {
-
-    // Lendo o prefixo e calculando seu tamanho:
-    char *prefixo = leStringDoCSV(arquivoCSV);
-    int tamanhoPrefixo = strlen(prefixo);
-
-    // Preenchendo '\0's caso necessário:
-    if (tamanhoPrefixo < 5) {
-        prefixo = realloc(prefixo, 6);
-        for (int i = tamanhoPrefixo; i < 6; i++)
-            prefixo[i] = '\0';
-    }
-
-    return prefixo;
-}
-
-/*  
-    Lê a data de um registro de dados de um arquivo csv
-    @param arquivoCSV: fluxo do arquivo csv a partir do qual a data será lida
-    @return char* data lida
-*/
-char *leDataDoCSV(FILE *arquivoCSV) {
-    
-    // Lendo a data:
-    char *data = leStringDoCSV(arquivoCSV);
-
-    // Se a data for nula, é preenchido lixo:
-    if (strcmp(data, "NULO") == 0) {
-        data = realloc(data, 11);
-        for (int i = 0; i < 10; i++)
-            data[i] = '@';
-        data[10] = '\0';
-    }
-
-    return data;
-}
-
-/*
     Aloca memória e preenche dados uma estrutura do tipo RegistroVeiculo a partir de um arquivo csv
     @param arquivoCSV: fluxo do arquivo csv de onde as informações do registro de dados serão extraídas
     @return RegistroVeiculo* ponteiro para a região de memória em que os dados foram armazenados 
@@ -93,27 +51,39 @@ RegistroVeiculo *carregaRegistroVeiculoDoCSV(FILE *arquivoCSV) {
     else
         registro->removido = '1';
 
-    // Lendo e marcando os demais campos:
-    char *prefixo = lePrefixoDoCSV(arquivoCSV);
+    // Marcando o campo prefixo:
+    char *prefixo = leStringDoCSV(arquivoCSV);
     strcpy(registro->prefixo, prefixo);
+    if (strlen(prefixo) < 5)
+        for (int i = strlen(prefixo); i < 6; i++)
+            registro->prefixo[i] = '\0';
 
-    char *data = leDataDoCSV(arquivoCSV);
+    // Marcando o campo data:
+    char *data = leStringDoCSV(arquivoCSV);
     strcpy(registro->data, data);
-    registro->data[0] = registro->data[0] == '@' ? '\0' : registro->data[0]; // lixos devem começar com '\0'
+    if (strcmp(data, "NULO") == 0) {
+        for (int i = 1; i < 10; i++)
+            registro->data[i] = '@';
+        registro->data[0] = '\0';
+    }
 
+    // Marcando os campos qtLugares e codLinha:
     registro->quantidadeLugares = leIntDoCSV(arquivoCSV);
     registro->codLinha = leIntDoCSV(arquivoCSV);
 
+    // Marcando o campo modelo:
     char *modelo = leStringDoCSV(arquivoCSV);
     strcpy(registro->modelo, modelo);
     registro->modelo[0] = strcmp(modelo, "NULO") == 0 ? '\0' : registro->modelo[0];
-    registro->tamanhoModelo = strlen(registro->modelo);
 
+    // Marcando o campo categoria:
     char *categoria = leStringDoCSV(arquivoCSV);
     strcpy(registro->categoria, categoria);
     registro->categoria[0] = strcmp(categoria, "NULO") == 0 ? '\0' : registro->categoria[0];
-    registro->tamanhoCategoria = strlen(registro->categoria);
 
+    // Marcando os demais campos:
+    registro->tamanhoModelo = strlen(registro->modelo);
+    registro->tamanhoCategoria = strlen(registro->categoria);
     registro->tamanhoRegistro = 31 + registro->tamanhoModelo + registro->tamanhoCategoria; 
 
     // Liberando memória alocada para leitura dos campos:
@@ -131,8 +101,10 @@ RegistroVeiculo *carregaRegistroVeiculoDoCSV(FILE *arquivoCSV) {
     @param arquivoBIN: fluxo do arquivo binário em que os dados serão escritos
 */
 void escreveCabecalhoVeiculoNoBIN(CabecalhoVeiculo *cabecalho, FILE *arquivoBIN) {
+
     // Pulando para o início do arquivo binário
     fseek(arquivoBIN, 0, SEEK_SET);
+
     // Escrevendo os campos do registro de cabeçalho no binário:
     fwrite(&cabecalho->status, 1, 1, arquivoBIN);
     fwrite(&cabecalho->byteProxReg, sizeof(long long), 1, arquivoBIN);
@@ -211,6 +183,7 @@ RegistroVeiculo *carregaRegistroVeiculoDoBIN(FILE *arquivoBIN) {
     // Alocando memória para uma estrutura do tipo RegistroVeiculo:
     RegistroVeiculo *registroVeiculo = malloc(sizeof(RegistroVeiculo));
 
+    // Lendo os campos do registro de dados do binário:
     fread(&registroVeiculo->removido, 1, 1, arquivoBIN);
     fread(&registroVeiculo->tamanhoRegistro, sizeof(int), 1, arquivoBIN);
     fread(registroVeiculo->prefixo, 5, 1, arquivoBIN);
@@ -227,6 +200,53 @@ RegistroVeiculo *carregaRegistroVeiculoDoBIN(FILE *arquivoBIN) {
     registroVeiculo->data[10] = '\0';
     registroVeiculo->modelo[registroVeiculo->tamanhoModelo] = '\0';
     registroVeiculo->categoria[registroVeiculo->tamanhoCategoria] = '\0';
+
+    return registroVeiculo;
+}
+
+/*
+    Aloca memória e preenche dados uma estrutura do tipo RegistroVeiculo a partir da entrada padrão
+    @return RegistroVeiculo* ponteiro para a região de memória em que os dados foram armazenados 
+*/
+RegistroVeiculo *carregaRegistroVeiculoDaStdin() {
+
+    // Alocando memória para uma estrutura do tipo RegistroVeiculo:
+    RegistroVeiculo *registroVeiculo = malloc(sizeof(RegistroVeiculo));
+
+    // Marcando o campo prefixo:
+    scan_quote_string(registroVeiculo->prefixo);
+
+    // Marcando campo data:
+    scan_quote_string(registroVeiculo->data);
+    if (strcmp(registroVeiculo->data, "") == 0) {
+        for (int i = 1; i < 10; i++)
+            registroVeiculo->data[i] = '@';
+        registroVeiculo->data[0] = '\0';
+    }
+
+    char inteiroAscii[10];
+
+    // Marcando o campo quantidade de lugares:
+    scan_quote_string(inteiroAscii);
+    registroVeiculo->quantidadeLugares = strcmp(inteiroAscii, "") != 0 ? atoi(inteiroAscii) : -1;
+
+    // Marcando o campo código da linha:
+    scan_quote_string(inteiroAscii);
+    registroVeiculo->codLinha = strcmp(inteiroAscii, "") != 0 ? atoi(inteiroAscii) : -1;
+
+    // Marcando o campo modelo:
+    scan_quote_string(registroVeiculo->modelo);
+    registroVeiculo->modelo[0] = strcmp(registroVeiculo->modelo, "") != 0 ? registroVeiculo->modelo[0] : '\0'; 
+
+    // Marcando o campo categoria:
+    scan_quote_string(registroVeiculo->categoria);
+    registroVeiculo->categoria[0] = strcmp(registroVeiculo->categoria, "") != 0 ? registroVeiculo->categoria[0] : '\0'; 
+
+    // Marcando os demais campos:
+    registroVeiculo->removido = '1';
+    registroVeiculo->tamanhoCategoria = strlen(registroVeiculo->categoria);
+    registroVeiculo->tamanhoModelo = strlen(registroVeiculo->modelo);
+    registroVeiculo->tamanhoRegistro = 31 + registroVeiculo->tamanhoModelo + registroVeiculo->tamanhoCategoria;
 
     return registroVeiculo;
 }

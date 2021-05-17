@@ -49,20 +49,23 @@ RegistroLinha *carregaRegistroLinhaDoCSV(FILE *arquivoCSV) {
     else
         registro->removido = '1';
 
-    // Lendo e marcando os demais campos:
+    // Marcando os campos codLinha e aceitaCartao:
     registro->codLinha = leIntDoCSV(arquivoCSV);
     registro->aceitaCartao = leCharDoCSV(arquivoCSV);
 
+    // Marcando o campo nomeLinha:
     char *nome = leStringDoCSV(arquivoCSV);
     strcpy(registro->nomeLinha, nome);
     registro->nomeLinha[0] = strcmp(nome, "NULO") == 0 ? '\0' : registro->nomeLinha[0];
-    registro->tamanhoNome = strlen(registro->nomeLinha);
 
+    // Marcando o campo corLinha:
     char *cor = leStringDoCSV(arquivoCSV);
     strcpy(registro->corLinha, cor);
     registro->corLinha[0] = strcmp(cor, "NULO") == 0 ? '\0' : registro->corLinha[0];
-    registro->tamanhoCor = strlen(registro->corLinha);
 
+    // Marcando os demais campos:
+    registro->tamanhoNome = strlen(registro->nomeLinha);
+    registro->tamanhoCor = strlen(registro->corLinha);
     registro->tamanhoRegistro = 13 + registro->tamanhoNome + registro->tamanhoCor; 
 
     // Liberando memória alocada para leitura dos campos:
@@ -150,6 +153,7 @@ RegistroLinha *carregaRegistroLinhaDoBIN(FILE *arquivoBIN) {
     // Alocando memória para uma estrutura do tipo RegistroLinha:
     RegistroLinha *registroLinha = malloc(sizeof(RegistroLinha));
 
+    // Lendo os campos do registro de dados do binário:
     fread(&registroLinha->removido, 1, 1, arquivoBIN);
     fread(&registroLinha->tamanhoRegistro, sizeof(int), 1, arquivoBIN);
     fread(&registroLinha->codLinha, sizeof(int), 1, arquivoBIN);
@@ -162,6 +166,42 @@ RegistroLinha *carregaRegistroLinhaDoBIN(FILE *arquivoBIN) {
     // Finalizando os campos string com '\0':
     registroLinha->nomeLinha[registroLinha->tamanhoNome] = '\0';
     registroLinha->corLinha[registroLinha->tamanhoCor] = '\0';
+
+    return registroLinha;
+}
+
+/*
+    Aloca memória e preenche dados uma estrutura do tipo RegistroLinha a partir da entrada padrão
+    @return RegistroLinha* ponteiro para a região de memória em que os dados foram armazenados 
+*/
+RegistroLinha *carregaRegistroLinhaDaStdin() {
+
+    // Alocando memória para uma estrutura do tipo RegistroLinha:
+    RegistroLinha *registroLinha = malloc(sizeof(RegistroLinha));
+
+    char buffer[10];
+
+    // Marcando o campo quantidade de lugares:
+    scan_quote_string(buffer);
+    registroLinha->codLinha = atoi(buffer);
+
+    // Marcando o campo aceita cartão: 
+    scan_quote_string(buffer);
+    registroLinha->aceitaCartao = strcmp(buffer, "") != 0 ? buffer[0] : '\0';
+
+    // Marcando o campo nome linha:
+    scan_quote_string(registroLinha->nomeLinha);
+    registroLinha->nomeLinha[0] = strcmp(registroLinha->nomeLinha, "") != 0 ? registroLinha->nomeLinha[0] : '\0'; 
+
+    // Marcando o campo categoria:
+    scan_quote_string(registroLinha->corLinha);
+    registroLinha->corLinha[0] = strcmp(registroLinha->corLinha, "") != 0 ? registroLinha->corLinha[0] : '\0'; 
+
+    // Marcando os demais campos:
+    registroLinha->removido = '1';
+    registroLinha->tamanhoNome = strlen(registroLinha->nomeLinha);
+    registroLinha->tamanhoCor = strlen(registroLinha->corLinha);
+    registroLinha->tamanhoRegistro = 13 + registroLinha->tamanhoNome + registroLinha->tamanhoCor;
 
     return registroLinha;
 }

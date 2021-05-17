@@ -39,6 +39,7 @@
     RegistroVeiculo *carregaRegistroVeiculoDoCSV(FILE *arquivoCSV);
     CabecalhoVeiculo *carregaCabecalhoVeiculoDoBIN(FILE *arquivoBIN); 
     RegistroVeiculo *carregaRegistroVeiculoDoBIN(FILE *arquivoBIN); 
+    RegistroVeiculo *carregaRegistroVeiculoDaStdin(void);
     void escreveCabecalhoVeiculoNoBIN(CabecalhoVeiculo *cabecalho, FILE *arquivoBIN);
     void escreveRegistroVeiculoNoBIN(RegistroVeiculo *registroVeiculo, FILE *arquivoBIN); 
 

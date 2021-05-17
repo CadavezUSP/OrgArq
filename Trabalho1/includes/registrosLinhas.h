@@ -35,6 +35,7 @@
     RegistroLinha *carregaRegistroLinhaDoCSV(FILE *arquivoCSV);
     CabecalhoLinha *carregaCabecalhoLinhaDoBIN(FILE *arquivoBIN); 
     RegistroLinha *carregaRegistroLinhaDoBIN(FILE *arquivoBIN); 
+    RegistroLinha *carregaRegistroLinhaDaStdin(void);
     void escreveCabecalhoLinhaNoBIN(CabecalhoLinha *cabecalho, FILE *arquivoBIN);
     void escreveRegistroLinhaNoBIN(RegistroLinha *registroLinha, FILE *arquivoBIN); 
 
