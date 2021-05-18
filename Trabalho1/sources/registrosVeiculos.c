@@ -250,3 +250,34 @@ RegistroVeiculo *carregaRegistroVeiculoDaStdin() {
 
     return registroVeiculo;
 }
+
+/*
+Descricao: Printa na tela o registro veiculos segundo a forma indicada pelo cabecalho
+@param Reg Registro veiculos que será printado na tela
+@param cabecalho estrutura de cabecalho que será utilizada para printar
+*/
+void veiculoNaTela (RegistroVeiculo *Reg, CabecalhoVeiculo *cabecalho){
+    printf("%s: ", cabecalho->descrevePrefixo);
+    printf("%s\n", Reg->prefixo);
+    printf("%s: ", cabecalho->descreveModelo);
+    if (Reg->modelo[0] != '\0') printf("%s\n", Reg->modelo);
+    else printf("campo com  valor  nulo\n");
+    printf ("%s: ", cabecalho->descreveCategoria);
+    if (Reg->categoria[0] != '\0') printf("%s\n", Reg->categoria);
+    else printf("campo com  valor  nulo\n");
+    printf("%s: ", cabecalho->descreveData);
+    if (Reg->data[0] != '\0'){
+        int ano = atoi (Reg->data);
+        int auxMes = atoi (Reg->data+5);
+        int dia = atoi (Reg->data+8);
+        char *mes = VerMes(auxMes);
+        printf("%d de %s de %d\n", dia, mes, ano);
+    }
+    else printf("campo com  valor  nulo\n");
+    printf("%s: ", cabecalho->descreveLugares);
+    if (Reg->quantidadeLugares != -1){
+        printf ("%d\n", Reg->quantidadeLugares);
+    }
+    else printf("campo com  valor  nulo\n");
+    printf("\n");
+}

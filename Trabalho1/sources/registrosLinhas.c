@@ -205,3 +205,36 @@ RegistroLinha *carregaRegistroLinhaDaStdin() {
 
     return registroLinha;
 }
+/*
+Descricao: Printa na tela o registro Linha segundo a forma indicada pelo cabecalho
+@param Reg Registro Linha que será printado na tela
+@param cabecalho estrutura de cabecalho que será utilizada para printar
+*/
+void LinhaNaTela (RegistroLinha *Reg, CabecalhoLinha *cabecalho){
+    printf("%s: ", cabecalho->descreveNome);
+    if (Reg->nomeLinha[0] != '\0') printf("%s\n", Reg->nomeLinha);
+    else printf("campo com  valor  nulo\n");
+    printf("%s: ", cabecalho->descreveCor);
+    if (Reg->corLinha[0] != '\0') printf("%s\n", Reg->corLinha);
+    else printf("campo com  valor  nulo\n");
+    printf ("%s: ", cabecalho->descreveCartao);
+    if (Reg->aceitaCartao != '\0') {
+        switch (Reg->aceitaCartao)
+        {
+        case 'S':
+            printf("PAGAMENTO  SOMENTE  COM  CARTAO  SEM  PRESENCA  DE COBRADOR\n");
+            break;
+        case 'N':
+            printf("PAGAMENTO EM CARTAO E DINHEIRO\n");
+            break;
+        case 'F':
+            printf("PAGAMENTO EM CARTAO SOMENTE NO FINAL DE SEMANA\n");
+            break;
+        
+        default:
+            break;
+        }
+    }
+    else printf("campo com  valor  nulo\n");
+    printf("\n");
+}

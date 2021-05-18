@@ -48,81 +48,20 @@ void createTableVeiculos(char *arquivoEntrada, char *arquivoSaida) {
     binarioNaTela(arquivoSaida);
 }
 
-/*Funcao: selectFromVeiculos
+/*
 Descricao: Le os veiculos do arquivo binario e printa na tela os registros
-Parâmetros: arquivoEntrada = nome do arquivo de entrada
-Variáveis: arquivoBin = arquivo binario que sera aberto para a leitura
-           Reg = ponteiro para armazenar as informacoes dos registros
-           fimDeArquivo = verifica se é o fim do arquivo
+@param arquivoEntrada  nome do arquivo de entrada
 */
-void selectFromVeiculos(char *arquivoEntrada) { //Cadavez
-/*    FILE* arquivoBin = fopen(arquivoEntrada, "rb");
-    RegistroVeiculo *Reg;
-    char fimDeArquivo=0;
-    fseek(arquivoBin, sizeof(CabecalhoVeiculo), SEEK_SET);
-    fread(&fimDeArquivo, sizeof(char), 1, arquivoBin);
-    while (fimDeArquivo != -1)
+void selectFromVeiculos(char *arquivoEntrada) { 
+    FILE* arquivoBin = fopen(arquivoEntrada, "rb"); // arquivo binario
+    CabecalhoVeiculo *Cabecalho = carregaCabecalhoVeiculoDoBIN(arquivoBin); // cabecalho
+    while (!fimDoArquivoBIN(arquivoBin))
     {
-        Reg = malloc(sizeof(RegistroVeiculo));
-        fseek(arquivoBin, -1, SEEK_CUR);
-        fread(&Reg->removido, sizeof(Reg->removido), 1, arquivoBin);
-        fread(&Reg->tamanhoRegistro, sizeof(Reg->tamanhoRegistro), 1, arquivoBin);
-        if (Reg->removido == '1'){
-            fseek(arquivoBin, Reg->tamanhoRegistro, SEEK_CUR);
-        }
-        else{
-            fread(&Reg->prefixo, sizeof(Reg->prefixo), 1, arquivoBin);
-            fread(&Reg->data, sizeof(Reg->data), 1, arquivoBin);
-            fread(&Reg->quantidadeLugares, sizeof(Reg->quantidadeLugares), 1, arquivoBin);
-            fread(&Reg->codLinha, sizeof(Reg->codLinha), 1, arquivoBin);
-            fread(&Reg->tamanhoModelo, sizeof(Reg->tamanhoModelo), 1, arquivoBin);
-            if (Reg->tamanhoModelo == 0) {
-                fread(&Reg->modelo, sizeof(char), 1, arquivoBin);
-                fseek(arquivoBin, 99, SEEK_CUR);
-            }
-            else{
-                fread(&Reg->modelo, sizeof(char), Reg->tamanhoModelo, arquivoBin);
-                fseek(arquivoBin, 100 - Reg->tamanhoModelo, SEEK_CUR);
-            }
-            fread(&Reg->tamanhoCategoria, sizeof(Reg->tamanhoCategoria), 1, arquivoBin);
-            if (Reg->tamanhoCategoria == 0) {
-                fread(&Reg->categoria, sizeof(char), 1, arquivoBin);
-                fseek(arquivoBin, 99, SEEK_CUR);
-            }
-            else{
-                fread(&Reg->categoria, sizeof(char), Reg->tamanhoModelo, arquivoBin);
-                fseek(arquivoBin, 100 - Reg->tamanhoCategoria, SEEK_CUR);
-            }
-            fread(&Reg->categoria, sizeof(char), Reg->tamanhoCategoria, arquivoBin);
-
-            // impressao na tela e verificação de arquivo nulo
-            printf("Prefixo do veiculo:");
-            for(int i=0;i<5;i++) printf("%c", Reg->prefixo[i]);
-            printf("\nModelo do veiculo: ");
-            if (Reg->modelo[0] != '\0') printf("%s\n", Reg->modelo);
-            else printf("campo com  valor  nulo\n");
-            printf ("Categoria do veiculo: ");
-            if (Reg->categoria[0] != '\0') printf("%s\n", Reg->categoria);
-            else printf("campo com  valor  nulo\n");
-            printf("Data de entrada do veiculona frota: ");
-            if (Reg->data[0] != '\0'){
-                int ano = atoi (Reg->data);
-                int auxMes = atoi (Reg->data+5);
-                int dia = atoi (Reg->data+8);
-                char *mes = VerMes(auxMes);
-                printf("%d de %s de %d\n", dia, mes, ano);
-            }
-            else printf("campo com  valor  nulo\n");
-            printf("Quantidade de lugares sentados disponiveis: ");
-            if (Reg->quantidadeLugares != -1){
-                printf ("%d", Reg->quantidadeLugares);
-            }
-            else printf("campo com  valor  nulo\n");
-        }
-        fread(&fimDeArquivo, sizeof(char), 1, SEEK_CUR);
-        printf("\n");
-        free (Reg);
-    }*/
+        RegistroVeiculo *Reg = carregaRegistroVeiculoDoBIN(arquivoBin);
+        veiculoNaTela(Reg, Cabecalho);
+        free(Reg);
+    }
+    free(Cabecalho);
 }
 
 void selectWhereVeiculos(char *arquivoEntrada, char *campo, char *valor) {//Cadavez
