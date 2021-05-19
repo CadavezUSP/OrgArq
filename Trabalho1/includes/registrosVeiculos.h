@@ -43,5 +43,6 @@
     void escreveCabecalhoVeiculoNoBIN(CabecalhoVeiculo *cabecalho, FILE *arquivoBIN);
     void escreveRegistroVeiculoNoBIN(RegistroVeiculo *registroVeiculo, FILE *arquivoBIN); 
     void veiculoNaTela (RegistroVeiculo *Reg, CabecalhoVeiculo *cabecalho);
+    RegistroVeiculo *localizarVeiculo(FILE *arquivoBIN, char* valor, char *campo);
 
 #endif
