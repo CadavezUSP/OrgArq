@@ -35,14 +35,16 @@ int main(int argc, char *argv[]) {
         char arquivoEntrada[100];
         char nomeCampo[100];
         char valor[100];
-        scanf("%s %s %s", arquivoEntrada, nomeCampo, valor);
+        scanf("%s %s", arquivoEntrada, nomeCampo);
+        scan_quote_string(valor);
         selectWhereVeiculos(arquivoEntrada, nomeCampo, valor);
     }
     else if (funcionalidade == SELECT_WHERE_LINHAS) {
         char arquivoEntrada[100];
         char nomeCampo[100];
         char valor[100];
-        scanf("%s %s %s", arquivoEntrada, nomeCampo, valor);
+        scanf("%s %s", arquivoEntrada, nomeCampo);
+        scan_quote_string(valor);
         selectWhereLinhas(arquivoEntrada, nomeCampo, valor);
     }
     else if (funcionalidade ==  INSERT_INTO_VEICULOS) {

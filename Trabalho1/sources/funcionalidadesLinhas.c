@@ -56,19 +56,45 @@ Descricao: Le os veiculos do arquivo binario e printa na tela os registros
 void selectFromLinhas(char *arquivoEntrada) {
     FILE* arquivoBin = fopen(arquivoEntrada, "rb"); //arquivo binario
     CabecalhoLinha *Cabecalho = carregaCabecalhoLinhaDoBIN(arquivoBin);
+    int printouRegistro = 0;
     // enquanto nao for fim de aqruivo ler o registro e printar na tela
     while (!fimDoArquivoBIN(arquivoBin))
     {
         RegistroLinha *Reg = carregaRegistroLinhaDoBIN(arquivoBin);
-        LinhaNaTela(Reg, Cabecalho);
+        if (Reg->removido == '1') LinhaNaTela(Reg, Cabecalho);
         free(Reg);
+        printouRegistro =1;
+    }
+    if (printouRegistro == 0){
+        printf("Registro inexistente.\n");
     }
     free(Cabecalho);
+    return;
 }
 
-
+/*
+Descricao: faz uma busca sequencial no binario da Linha e retorna em todos os arquivos que satisfazem a condicao da busca
+@param arquivoEntrada nome do arquivo binario
+@param campo nome do campo buscado
+@param valor valor do campo buscado
+*/
 void selectWhereLinhas(char *arquivoEntrada, char *campo, char *valor) {// Cadavez
-
+    FILE *arquivoBIN = fopen(arquivoEntrada, "rb");
+    CabecalhoLinha *cabecalho = carregaCabecalhoLinhaDoBIN(arquivoBIN);
+    int printouRegistro = 0;
+    do {
+        RegistroLinha *reg = localizarLinha(arquivoBIN, valor, campo);
+        if (reg == NULL) break;
+        LinhaNaTela(reg, cabecalho);
+        printouRegistro =1;
+        free(reg);
+    } while (!fimDoArquivoBIN(arquivoBIN));
+    if (printouRegistro == 0){
+        printf("Registro inexistente.\n");
+    }
+    fclose(arquivoBIN);
+    free (cabecalho);
+    return;
 }
 
 
