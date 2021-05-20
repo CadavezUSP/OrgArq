@@ -261,23 +261,85 @@ void veiculoNaTela (RegistroVeiculo *Reg, CabecalhoVeiculo *cabecalho){
     printf("%s\n", Reg->prefixo);
     printf("%s: ", cabecalho->descreveModelo);
     if (Reg->modelo[0] != '\0') printf("%s\n", Reg->modelo);
-    else printf("campo com  valor  nulo\n");
+    else printf("campo com valor nulo\n");
     printf ("%s: ", cabecalho->descreveCategoria);
     if (Reg->categoria[0] != '\0') printf("%s\n", Reg->categoria);
-    else printf("campo com  valor  nulo\n");
+    else printf("campo com valor nulo\n");
     printf("%s: ", cabecalho->descreveData);
     if (Reg->data[0] != '\0'){
         int ano = atoi (Reg->data);
         int auxMes = atoi (Reg->data+5);
         int dia = atoi (Reg->data+8);
         char *mes = VerMes(auxMes);
-        printf("%d de %s de %d\n", dia, mes, ano);
+        if (dia >=10) printf("%d de %s de %d\n", dia, mes, ano);
+        else printf("0%d de %s de %d\n", dia, mes, ano);
     }
-    else printf("campo com  valor  nulo\n");
+    else printf("campo com valor nulo\n");
     printf("%s: ", cabecalho->descreveLugares);
     if (Reg->quantidadeLugares != -1){
         printf ("%d\n", Reg->quantidadeLugares);
     }
-    else printf("campo com  valor  nulo\n");
+    else printf("campo com valor nulo\n");
     printf("\n");
+}
+
+/*
+Descricao: localiza qual campo está sendo buscado e faz uma busca sequencial no binário retornando o registro que satisfaz a condicao de busca
+@param arquivoBIN arquivo binario que será utilizado para busca
+@param valor valor buscado
+@param campo campo buscado
+@return Registro que possui o campo buscado com o valor fornecido, retorna NULL caso nada seja encontrado
+*/
+RegistroVeiculo *localizarVeiculo(FILE *arquivoBIN, char* valor, char *campo){
+    if (strcmp("categoria", campo) == 0){
+        while (!fimDoArquivoBIN(arquivoBIN))
+        {
+            RegistroVeiculo *reg = carregaRegistroVeiculoDoBIN(arquivoBIN);
+            if (strcmp(reg->categoria, valor)==0 && reg->removido == '1') return reg;
+            else free(reg);
+        }
+    }
+    else if(strcmp("data", campo) ==0){
+        while (!fimDoArquivoBIN(arquivoBIN))
+        {
+            RegistroVeiculo *reg = carregaRegistroVeiculoDoBIN(arquivoBIN);
+            if (strcmp(reg->data, valor)==0 && reg->removido == '1') return reg;
+            else free(reg);
+        }
+    }
+    else if(strcmp("codLinha" , campo) ==0){
+        int aux = atoi(valor);
+        while (!fimDoArquivoBIN(arquivoBIN))
+        {
+            RegistroVeiculo *reg = carregaRegistroVeiculoDoBIN(arquivoBIN);
+            if (reg->quantidadeLugares == aux && reg->removido == '1') return reg;
+            else free(reg);
+        }
+    }
+    else if (strcmp("quantidadeLugares", campo) == 0){
+        int aux = atoi(valor);
+        while (!fimDoArquivoBIN(arquivoBIN))
+        {
+            RegistroVeiculo *reg = carregaRegistroVeiculoDoBIN(arquivoBIN);
+            if (reg->quantidadeLugares == aux && reg->removido == '1') return reg;
+            else free(reg);
+        }
+    }
+    else if (strcmp("modelo", campo) == 0){
+        while (!fimDoArquivoBIN(arquivoBIN))
+        {
+            RegistroVeiculo *reg = carregaRegistroVeiculoDoBIN(arquivoBIN);
+            if (strcmp(reg->modelo, valor)==0 && reg->removido == '1') return reg;
+            else free(reg);
+        }
+    }
+    else if (strcmp("prefixo", campo) == 0){
+        while (!fimDoArquivoBIN(arquivoBIN))
+        {
+            RegistroVeiculo *reg = carregaRegistroVeiculoDoBIN(arquivoBIN);
+            if (strcmp(reg->prefixo, valor)==0 && reg->removido == '1') return reg;
+            else free(reg);
+        }
+    }
+    return NULL;
 }
