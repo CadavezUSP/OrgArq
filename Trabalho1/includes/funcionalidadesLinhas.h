@@ -15,5 +15,6 @@
     void selectFromLinhas(char *arquivoEntrada);
     void selectWhereLinhas(char *arquivoEntrada, char *campo, char *valor);
     void insertIntoLinhas(char *arquivoEntrada, int numeroRegistros);
+    void LinhaNaTela (RegistroLinha *Reg, CabecalhoLinha *cabecalho);
 
 #endif

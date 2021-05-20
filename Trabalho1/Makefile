@@ -1,7 +1,7 @@
 SRC = ./sources
 INC = ./includes
 EXE = trabalho1 
-FLAGS = -Wall -Werror -I
+FLAGS = -Wall -Werror
 
 all: compile
 

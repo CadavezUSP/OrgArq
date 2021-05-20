@@ -48,9 +48,22 @@ void createTableLinhas(char *arquivoEntrada, char *arquivoSaida) {
     binarioNaTela(arquivoSaida);
 }
 
+/*
+Descricao: Le os veiculos do arquivo binario e printa na tela os registros
+@param arquivoEntrada  nome do arquivo de entrada
+*/
 
-void selectFromLinhas(char *arquivoEntrada) {// Cadavez
-
+void selectFromLinhas(char *arquivoEntrada) {
+    FILE* arquivoBin = fopen(arquivoEntrada, "rb"); //arquivo binario
+    CabecalhoLinha *Cabecalho = carregaCabecalhoLinhaDoBIN(arquivoBin);
+    // enquanto nao for fim de aqruivo ler o registro e printar na tela
+    while (!fimDoArquivoBIN(arquivoBin))
+    {
+        RegistroLinha *Reg = carregaRegistroLinhaDoBIN(arquivoBin);
+        LinhaNaTela(Reg, Cabecalho);
+        free(Reg);
+    }
+    free(Cabecalho);
 }
 
 

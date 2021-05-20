@@ -38,5 +38,6 @@
     RegistroLinha *carregaRegistroLinhaDaStdin(void);
     void escreveCabecalhoLinhaNoBIN(CabecalhoLinha *cabecalho, FILE *arquivoBIN);
     void escreveRegistroLinhaNoBIN(RegistroLinha *registroLinha, FILE *arquivoBIN); 
+    RegistroLinha *localizarLinha(FILE *arquivoBIN, char* valor, char *campo);
 
 #endif
