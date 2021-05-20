@@ -1,9 +1,9 @@
 #include "funcionalidadesLinhas.h"
 
 /*
-    Cria um arquivo binário com dados contidos em um arquivo csv
-    @param arquivoEntrada nome do arquivo csv de onde os dados serão estraídos
-    @param arquivoSaida nome do arquivo binário no qual os dados serão escritos 
+Descrição: Cria um arquivo binário com dados contidos em um arquivo csv
+@param arquivoEntrada nome do arquivo csv de onde os dados serão estraídos
+@param arquivoSaida nome do arquivo binário no qual os dados serão escritos 
 */
 void createTableLinhas(char *arquivoEntrada, char *arquivoSaida) {
     
@@ -52,7 +52,6 @@ void createTableLinhas(char *arquivoEntrada, char *arquivoSaida) {
 Descricao: Le os veiculos do arquivo binario e printa na tela os registros
 @param arquivoEntrada  nome do arquivo de entrada
 */
-
 void selectFromLinhas(char *arquivoEntrada) {
     FILE* arquivoBin = fopen(arquivoEntrada, "rb"); //arquivo binario
     CabecalhoLinha *Cabecalho = carregaCabecalhoLinhaDoBIN(arquivoBin);
@@ -61,7 +60,7 @@ void selectFromLinhas(char *arquivoEntrada) {
     while (!fimDoArquivoBIN(arquivoBin))
     {
         RegistroLinha *Reg = carregaRegistroLinhaDoBIN(arquivoBin);
-        if (Reg->removido == '1') LinhaNaTela(Reg, Cabecalho);
+        if (Reg->removido == '1') linhaNaTela(Reg, Cabecalho);
         free(Reg);
         printouRegistro =1;
     }
@@ -69,6 +68,7 @@ void selectFromLinhas(char *arquivoEntrada) {
         printf("Registro inexistente.\n");
     }
     free(Cabecalho);
+    fclose(arquivoBin);
     return;
 }
 
@@ -83,9 +83,9 @@ void selectWhereLinhas(char *arquivoEntrada, char *campo, char *valor) {// Cadav
     CabecalhoLinha *cabecalho = carregaCabecalhoLinhaDoBIN(arquivoBIN);
     int printouRegistro = 0;
     do {
-        RegistroLinha *reg = localizarLinha(arquivoBIN, valor, campo);
+        RegistroLinha *reg = localizaLinha(arquivoBIN, valor, campo);
         if (reg == NULL) break;
-        LinhaNaTela(reg, cabecalho);
+        linhaNaTela(reg, cabecalho);
         printouRegistro =1;
         free(reg);
     } while (!fimDoArquivoBIN(arquivoBIN));
@@ -97,11 +97,10 @@ void selectWhereLinhas(char *arquivoEntrada, char *campo, char *valor) {// Cadav
     return;
 }
 
-
 /*
-    Insere um conjunto de registros em um arquivo binário com dados lidos da entrada padrão 
-    @param arquivoEntrada nome do arquivo binário em que os registros serão inseridos 
-    @param numeroRegistros numero de registros que serão inseridos
+Descrição: Insere um conjunto de registros em um arquivo binário com dados lidos da entrada padrão 
+@param arquivoEntrada nome do arquivo binário em que os registros serão inseridos 
+@param numeroRegistros numero de registros que serão inseridos
 */
 void insertIntoLinhas(char *arquivoEntrada, int numeroRegistros) {
 

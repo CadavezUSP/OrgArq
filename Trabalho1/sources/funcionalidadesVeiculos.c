@@ -1,12 +1,9 @@
 #include "funcionalidadesVeiculos.h"
-#include <string.h>
-
-
 
 /*
-    Cria um arquivo binário com dados contidos em um arquivo csv
-    @param arquivoEntrada nome do arquivo csv de onde os dados serão estraídos
-    @param arquivoSaida nome do arquivo binário no qual os dados serão escritos 
+Descrição: Cria um arquivo binário com dados contidos em um arquivo csv
+@param arquivoEntrada nome do arquivo csv de onde os dados serão estraídos
+@param arquivoSaida nome do arquivo binário no qual os dados serão escritos 
 */
 void createTableVeiculos(char *arquivoEntrada, char *arquivoSaida) {
     
@@ -72,6 +69,7 @@ void selectFromVeiculos(char *arquivoEntrada) {
     fclose(arquivoBin);
     free(Cabecalho);
 }
+
 /*
 Descricao: faz uma busca sequencial no binario dos veiculos e retorna em todos os arquivos que satisfazem a condicao da busca
 @param arquivoEntrada nome do arquivo binario
@@ -84,23 +82,23 @@ void selectWhereVeiculos(char *arquivoEntrada, char *campo, char *valor) {//Cada
     RegistroVeiculo *reg;
     int printouRegistro = 0;
     do {
-        reg = localizarVeiculo(arquivoBIN, valor, campo);
+        reg = localizaVeiculo(arquivoBIN, valor, campo);
         if (reg == NULL) break;
         printouRegistro =1;
         veiculoNaTela(reg, cabecalho);
         free(reg);
     } while (!fimDoArquivoBIN(arquivoBIN));
-    if (printouRegistro == 0){
+    if (printouRegistro == 0) {
         printf("Registro inexistente.\n");
     }
     fclose(arquivoBIN);
-    free (cabecalho);
+    free(cabecalho);
 }
 
 /*
-    Insere um conjunto de registros em um arquivo binário com dados lidos da entrada padrão 
-    @param arquivoEntrada nome do arquivo binário em que os registros serão inseridos 
-    @param numeroRegistros numero de registros que serão inseridos
+Descrição: Insere um conjunto de registros em um arquivo binário com dados lidos da entrada padrão 
+@param arquivoEntrada nome do arquivo binário em que os registros serão inseridos 
+@param numeroRegistros número de registros que serão inseridos
 */
 void insertIntoVeiculos(char *arquivoEntrada, int numeroRegistros) {
 

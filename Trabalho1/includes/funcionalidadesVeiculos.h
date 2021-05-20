@@ -2,6 +2,7 @@
     #define __FUNCIONALIDADES_VEICULOS_H__
 
     #include <stdio.h>
+    #include <string.h>
     #include "registrosVeiculos.h"
     #include "leitorCSV.h"
     #include "util.h"

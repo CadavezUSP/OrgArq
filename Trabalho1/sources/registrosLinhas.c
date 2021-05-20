@@ -1,9 +1,9 @@
 #include "registrosLinhas.h"
 
 /*
-    Aloca memória e preenche dados uma estrutura do tipo CabecalhoLinha a partir de um arquivo csv
-    @param arquivoCSV: fluxo do arquivo csv de onde as informações do registro de cabeçalho serão extraídas
-    @return CabecalhoLinha* ponteiro para a região de memória em que os dados foram armazenados 
+Descrição: Aloca memória e preenche dados uma estrutura do tipo CabecalhoLinha a partir de um arquivo csv
+@param arquivoCSV: fluxo do arquivo csv de onde as informações do registro de cabeçalho serão extraídas
+@return CabecalhoLinha* ponteiro para a região de memória em que os dados foram armazenados 
 */
 CabecalhoLinha *carregaCabecalhoLinhaDoCSV(FILE *arquivoCSV) {
 
@@ -34,9 +34,9 @@ CabecalhoLinha *carregaCabecalhoLinhaDoCSV(FILE *arquivoCSV) {
 }
 
 /*
-    Aloca memória e preenche dados uma estrutura do tipo RegistroLinha a partir de um arquivo csv
-    @param arquivoCSV: fluxo do arquivo csv de onde as informações do registro de dados serão extraídas
-    @return RegistroLinha* ponteiro para a região de memória em que os dados foram armazenados 
+Descrição: Aloca memória e preenche dados uma estrutura do tipo RegistroLinha a partir de um arquivo csv
+@param arquivoCSV: fluxo do arquivo csv de onde as informações do registro de dados serão extraídas
+@return RegistroLinha* ponteiro para a região de memória em que os dados foram armazenados 
 */
 RegistroLinha *carregaRegistroLinhaDoCSV(FILE *arquivoCSV) {
 
@@ -76,9 +76,9 @@ RegistroLinha *carregaRegistroLinhaDoCSV(FILE *arquivoCSV) {
 }
 
 /*
-    Escreve os dados de uma estrutura do tipo CabecalhoLinha* em um arquivo binário
-    @param cabecalho: ponteiro para a região de memória onde o registro de cabeçalho está armazenado 
-    @param arquivoBIN: fluxo do arquivo binário em que os dados serão escritos
+Descrição: Escreve os dados de uma estrutura do tipo CabecalhoLinha* em um arquivo binário
+@param cabecalho: ponteiro para a região de memória onde o registro de cabeçalho está armazenado 
+@param arquivoBIN: fluxo do arquivo binário em que os dados serão escritos
 */
 void escreveCabecalhoLinhaNoBIN(CabecalhoLinha *cabecalho, FILE *arquivoBIN) {
     // Pulando para o início do arquivo binário
@@ -95,9 +95,9 @@ void escreveCabecalhoLinhaNoBIN(CabecalhoLinha *cabecalho, FILE *arquivoBIN) {
 }
 
 /*
-    Escreve os dados de uma estrutura do tipo RegistroLinha* em um arquivo binário
-    @param registroLinha: ponteiro para a região de memória onde o registro de dados está armazenado 
-    @param arquivoBIN: fluxo do arquivo binário em que os dados serão escritos
+Descrição: Escreve os dados de uma estrutura do tipo RegistroLinha* em um arquivo binário
+@param registroLinha: ponteiro para a região de memória onde o registro de dados está armazenado 
+@param arquivoBIN: fluxo do arquivo binário em que os dados serão escritos
 */
 void escreveRegistroLinhaNoBIN(RegistroLinha *registroLinha, FILE *arquivoBIN) {
     // Escrevendo os campos do registro de dados no binário:
@@ -112,9 +112,9 @@ void escreveRegistroLinhaNoBIN(RegistroLinha *registroLinha, FILE *arquivoBIN) {
 }
 
 /*
-    Aloca memória e preenche dados uma estrutura do tipo CabecalhoLinha a partir de um arquivo binário 
-    @param arquivoBIN: fluxo do arquivo binário de onde as informações do registro de cabeçalho serão extraídas
-    @return CabecalhoLinha* ponteiro para a região de memória em que os dados foram armazenados 
+Descrição: Aloca memória e preenche dados uma estrutura do tipo CabecalhoLinha a partir de um arquivo binário 
+@param arquivoBIN: fluxo do arquivo binário de onde as informações do registro de cabeçalho serão extraídas
+@return CabecalhoLinha* ponteiro para a região de memória em que os dados foram armazenados 
 */
 CabecalhoLinha *carregaCabecalhoLinhaDoBIN(FILE *arquivoBIN) {
 
@@ -144,9 +144,9 @@ CabecalhoLinha *carregaCabecalhoLinhaDoBIN(FILE *arquivoBIN) {
 }
 
 /*
-    Aloca memória e preenche dados uma estrutura do tipo RegistroLinha a partir de um arquivo binário 
-    @param arquivoBIN: fluxo do arquivo binário de onde as informações do registro de dados serão extraídas
-    @return RegistroLinha* ponteiro para a região de memória em que os dados foram armazenados 
+Descrição: Aloca memória e preenche dados uma estrutura do tipo RegistroLinha a partir de um arquivo binário 
+@param arquivoBIN: fluxo do arquivo binário de onde as informações do registro de dados serão extraídas
+@return RegistroLinha* ponteiro para a região de memória em que os dados foram armazenados 
 */
 RegistroLinha *carregaRegistroLinhaDoBIN(FILE *arquivoBIN) {
 
@@ -171,8 +171,8 @@ RegistroLinha *carregaRegistroLinhaDoBIN(FILE *arquivoBIN) {
 }
 
 /*
-    Aloca memória e preenche dados uma estrutura do tipo RegistroLinha a partir da entrada padrão
-    @return RegistroLinha* ponteiro para a região de memória em que os dados foram armazenados 
+Descrição: Aloca memória e preenche dados uma estrutura do tipo RegistroLinha a partir da entrada padrão
+@return RegistroLinha* ponteiro para a região de memória em que os dados foram armazenados 
 */
 RegistroLinha *carregaRegistroLinhaDaStdin() {
 
@@ -205,12 +205,13 @@ RegistroLinha *carregaRegistroLinhaDaStdin() {
 
     return registroLinha;
 }
+
 /*
 Descricao: Printa na tela o registro Linha segundo a forma indicada pelo cabecalho
 @param Reg Registro Linha que será printado na tela
 @param cabecalho estrutura de cabecalho que será utilizada para printar
 */
-void LinhaNaTela (RegistroLinha *Reg, CabecalhoLinha *cabecalho){
+void linhaNaTela (RegistroLinha *Reg, CabecalhoLinha *cabecalho){
     printf("%s: ", cabecalho->descreveCodigo);
     printf("%d\n", Reg->codLinha);
     printf("%s: ", cabecalho->descreveNome);
@@ -248,7 +249,7 @@ Descricao: localiza qual campo está sendo buscado e faz uma busca sequencial no
 @param campo campo buscado
 @return Registro que possui o campo buscado com o valor fornecido, retorna NULL caso nada seja encontrado
 */
-RegistroLinha *localizarLinha(FILE *arquivoBIN, char* valor, char *campo){
+RegistroLinha *localizaLinha(FILE *arquivoBIN, char* valor, char *campo){
     if (strcmp("nomeLinha", campo) == 0){
         while (!fimDoArquivoBIN(arquivoBIN))
         {

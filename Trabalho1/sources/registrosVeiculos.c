@@ -1,9 +1,9 @@
 #include "registrosVeiculos.h"
 
 /*
-    Aloca memória e preenche dados uma estrutura do tipo CabecalhoVeiculo a partir de um arquivo csv
-    @param arquivoCSV: fluxo do arquivo csv de onde as informações do registro de cabeçalho serão extraídas
-    @return CabecalhoVeiculo* ponteiro para a região de memória em que os dados foram armazenados 
+Descrição: Aloca memória e preenche dados uma estrutura do tipo CabecalhoVeiculo a partir de um arquivo csv
+@param arquivoCSV: fluxo do arquivo csv de onde as informações do registro de cabeçalho serão extraídas
+@return CabecalhoVeiculo* ponteiro para a região de memória em que os dados foram armazenados 
 */
 CabecalhoVeiculo *carregaCabecalhoVeiculoDoCSV(FILE *arquivoCSV) {
 
@@ -36,9 +36,9 @@ CabecalhoVeiculo *carregaCabecalhoVeiculoDoCSV(FILE *arquivoCSV) {
 }
 
 /*
-    Aloca memória e preenche dados uma estrutura do tipo RegistroVeiculo a partir de um arquivo csv
-    @param arquivoCSV: fluxo do arquivo csv de onde as informações do registro de dados serão extraídas
-    @return RegistroVeiculo* ponteiro para a região de memória em que os dados foram armazenados 
+Descrição: Aloca memória e preenche dados uma estrutura do tipo RegistroVeiculo a partir de um arquivo csv
+@param arquivoCSV: fluxo do arquivo csv de onde as informações do registro de dados serão extraídas
+@return RegistroVeiculo* ponteiro para a região de memória em que os dados foram armazenados 
 */
 RegistroVeiculo *carregaRegistroVeiculoDoCSV(FILE *arquivoCSV) {
 
@@ -96,9 +96,9 @@ RegistroVeiculo *carregaRegistroVeiculoDoCSV(FILE *arquivoCSV) {
 }
 
 /*
-    Escreve os dados de uma estrutura do tipo CabecalhoVeiculo* em um arquivo binário
-    @param cabecalho: ponteiro para a região de memória onde o registro de cabeçalho está armazenado 
-    @param arquivoBIN: fluxo do arquivo binário em que os dados serão escritos
+Descrição: Escreve os dados de uma estrutura do tipo CabecalhoVeiculo* em um arquivo binário
+@param cabecalho: ponteiro para a região de memória onde o registro de cabeçalho está armazenado 
+@param arquivoBIN: fluxo do arquivo binário em que os dados serão escritos
 */
 void escreveCabecalhoVeiculoNoBIN(CabecalhoVeiculo *cabecalho, FILE *arquivoBIN) {
 
@@ -119,9 +119,9 @@ void escreveCabecalhoVeiculoNoBIN(CabecalhoVeiculo *cabecalho, FILE *arquivoBIN)
 }
 
 /*
-    Escreve os dados de uma estrutura do tipo RegistroVeiculo* em um arquivo binário
-    @param registroVeiculo: ponteiro para a região de memória onde o registro de dados está armazenado 
-    @param arquivoBIN: fluxo do arquivo binário em que os dados serão escritos
+Descrição: Escreve os dados de uma estrutura do tipo RegistroVeiculo* em um arquivo binário
+@param registroVeiculo: ponteiro para a região de memória onde o registro de dados está armazenado 
+@param arquivoBIN: fluxo do arquivo binário em que os dados serão escritos
 */
 void escreveRegistroVeiculoNoBIN(RegistroVeiculo *registroVeiculo, FILE *arquivoBIN) {
     // Escrevendo os campos do registro de dados no binário:
@@ -138,9 +138,9 @@ void escreveRegistroVeiculoNoBIN(RegistroVeiculo *registroVeiculo, FILE *arquivo
 }
 
 /*
-    Aloca memória e preenche dados uma estrutura do tipo CabecalhoVeiculo a partir de um arquivo binário 
-    @param arquivoBIN: fluxo do arquivo binário de onde as informações do registro de cabeçalho serão extraídas
-    @return CabecalhoVeiculo* ponteiro para a região de memória em que os dados foram armazenados 
+Descrição: Aloca memória e preenche dados uma estrutura do tipo CabecalhoVeiculo a partir de um arquivo binário 
+@param arquivoBIN: fluxo do arquivo binário de onde as informações do registro de cabeçalho serão extraídas
+@return CabecalhoVeiculo* ponteiro para a região de memória em que os dados foram armazenados 
 */
 CabecalhoVeiculo *carregaCabecalhoVeiculoDoBIN(FILE *arquivoBIN) {
 
@@ -174,9 +174,9 @@ CabecalhoVeiculo *carregaCabecalhoVeiculoDoBIN(FILE *arquivoBIN) {
 }
 
 /*
-    Aloca memória e preenche dados uma estrutura do tipo RegistroVeiculo a partir de um arquivo binário 
-    @param arquivoBIN: fluxo do arquivo binário de onde as informações do registro de dados serão extraídas
-    @return RegistroVeiculo* ponteiro para a região de memória em que os dados foram armazenados 
+Descrição: Aloca memória e preenche dados uma estrutura do tipo RegistroVeiculo a partir de um arquivo binário 
+@param arquivoBIN: fluxo do arquivo binário de onde as informações do registro de dados serão extraídas
+@return RegistroVeiculo* ponteiro para a região de memória em que os dados foram armazenados 
 */
 RegistroVeiculo *carregaRegistroVeiculoDoBIN(FILE *arquivoBIN) {
 
@@ -205,8 +205,8 @@ RegistroVeiculo *carregaRegistroVeiculoDoBIN(FILE *arquivoBIN) {
 }
 
 /*
-    Aloca memória e preenche dados uma estrutura do tipo RegistroVeiculo a partir da entrada padrão
-    @return RegistroVeiculo* ponteiro para a região de memória em que os dados foram armazenados 
+Descrição: Aloca memória e preenche dados uma estrutura do tipo RegistroVeiculo a partir da entrada padrão
+@return RegistroVeiculo* ponteiro para a região de memória em que os dados foram armazenados 
 */
 RegistroVeiculo *carregaRegistroVeiculoDaStdin() {
 
@@ -256,7 +256,7 @@ Descricao: Printa na tela o registro veiculos segundo a forma indicada pelo cabe
 @param Reg Registro veiculos que será printado na tela
 @param cabecalho estrutura de cabecalho que será utilizada para printar
 */
-void veiculoNaTela (RegistroVeiculo *Reg, CabecalhoVeiculo *cabecalho){
+void veiculoNaTela(RegistroVeiculo *Reg, CabecalhoVeiculo *cabecalho) {
     printf("%s: ", cabecalho->descrevePrefixo);
     printf("%s\n", Reg->prefixo);
     printf("%s: ", cabecalho->descreveModelo);
@@ -270,9 +270,10 @@ void veiculoNaTela (RegistroVeiculo *Reg, CabecalhoVeiculo *cabecalho){
         int ano = atoi (Reg->data);
         int auxMes = atoi (Reg->data+5);
         int dia = atoi (Reg->data+8);
-        char *mes = VerMes(auxMes);
+        char *mes = verMes(auxMes);
         if (dia >=10) printf("%d de %s de %d\n", dia, mes, ano);
         else printf("0%d de %s de %d\n", dia, mes, ano);
+        free(mes);
     }
     else printf("campo com valor nulo\n");
     printf("%s: ", cabecalho->descreveLugares);
@@ -290,7 +291,7 @@ Descricao: localiza qual campo está sendo buscado e faz uma busca sequencial no
 @param campo campo buscado
 @return Registro que possui o campo buscado com o valor fornecido, retorna NULL caso nada seja encontrado
 */
-RegistroVeiculo *localizarVeiculo(FILE *arquivoBIN, char* valor, char *campo){
+RegistroVeiculo *localizaVeiculo(FILE *arquivoBIN, char* valor, char *campo){
     if (strcmp("categoria", campo) == 0){
         while (!fimDoArquivoBIN(arquivoBIN))
         {

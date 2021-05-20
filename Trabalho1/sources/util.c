@@ -1,45 +1,44 @@
 #include "util.h"
 
-
-char* VerMes(int num){
+char* verMes(int num){
     char *mes = malloc(15*sizeof(char));
     switch (num)
     {
         case 1:
-            mes  = "janeiro";
+            strcpy(mes, "janeiro");
             break;
         case 2:
-            mes  = "fevereiro";
+            strcpy(mes, "fevereiro");
             break;
         case 3:
-            mes  = "março";
+            strcpy(mes, "março");
             break;
         case 4:
-            mes  = "abril";
+            strcpy(mes, "abril");
             break;
         case 5:
-            mes  = "maio";
+            strcpy(mes, "maio");
             break;
         case 6:
-            mes  = "junho";
+            strcpy(mes, "junho");
             break;
         case 7:
-            mes  = "julho";
+            strcpy(mes, "julho");
             break;
         case 8:
-            mes  = "agosto";
+            strcpy(mes, "agosto");
             break;
         case 9:
-            mes  = "setembro";
+            strcpy(mes, "setembro");
             break;
         case 10:
-            mes  = "outubro";
+            strcpy(mes, "outubro");
             break;
         case 11:
-            mes  = "novembro";
+            strcpy(mes, "novembro");
             break;
         case 12:
-            mes  = "dezembro";
+            strcpy(mes, "dezembro");
             break;
 
         default:
@@ -50,17 +49,17 @@ char* VerMes(int num){
 }
 
 /*
-	Imprime a mensagem "Falha no processamento do arquivo."
-	@param stream fluxo no qual a mensagem será impressa
+Imprime a mensagem "Falha no processamento do arquivo."
+@param stream fluxo no qual a mensagem será impressa
 */
 void imprimeMensagemErro(FILE *stream) {
 	fprintf(stream, "Falha no processamento do arquivo.");
 }
 
 /*
-    Verifica se o fluxo passado por parâmetro chegou ao seu fim
-    @param arquivoBIN: fluxo do arquivo binário a ser verificado
-    @return int 1 se verdadeiro | 0 se falso
+Verifica se o fluxo passado por parâmetro chegou ao seu fim
+@param arquivoBIN: fluxo do arquivo binário a ser verificado
+@return int 1 se verdadeiro | 0 se falso
 */
 int fimDoArquivoBIN(FILE *arquivoBIN) {
 

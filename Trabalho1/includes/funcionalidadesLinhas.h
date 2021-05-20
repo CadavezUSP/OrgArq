@@ -2,6 +2,7 @@
     #define __FUNCIONALIDADES_LINHAS_H__
 
     #include <stdio.h>
+    #include <string.h>
     #include "registrosLinhas.h"
     #include "leitorCSV.h"
     #include "util.h"
@@ -15,6 +16,5 @@
     void selectFromLinhas(char *arquivoEntrada);
     void selectWhereLinhas(char *arquivoEntrada, char *campo, char *valor);
     void insertIntoLinhas(char *arquivoEntrada, int numeroRegistros);
-    void LinhaNaTela (RegistroLinha *Reg, CabecalhoLinha *cabecalho);
 
 #endif

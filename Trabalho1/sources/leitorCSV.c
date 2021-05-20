@@ -1,9 +1,9 @@
 #include "leitorCSV.h"
 
 /*
-    Verifca se o caractere passado por parâmetro é um delimitador de campo ou de registro
-    @param caractere caractere a ser verificado
-    @return int 1 se verdadeiro | 0 se falso
+Descrição: Verifca se o caractere passado por parâmetro é um delimitador de campo ou de registro
+@param caractere caractere a ser verificado
+@return int 1 se verdadeiro | 0 se falso
 */
 bool ehDelimitador(char caractere) {
 
@@ -14,9 +14,9 @@ bool ehDelimitador(char caractere) {
 }
 
 /*
-    Verifica se o fluxo passado por parâmetro chegou ao seu fim
-    @param stream: fluxo a ser verificado
-    @return int 1 se verdadeiro | 0 se falso
+Descrição: Verifica se o fluxo passado por parâmetro chegou ao seu fim
+@param stream: fluxo a ser verificado
+@return int 1 se verdadeiro | 0 se falso
 */
 bool fimDoArquivoCSV(FILE *stream) {
 
@@ -28,9 +28,9 @@ bool fimDoArquivoCSV(FILE *stream) {
 }
 
 /*
-    Verifica se um registro prestes a ser lido está marcado como logicamente removido
-    @param arquivoCSV: fluxo do arquivo csv a partir do qual a verificação será feita
-    @return int 1 se verdadeiro | 0 se falso
+Descrição: Verifica se um registro prestes a ser lido está marcado como logicamente removido
+@param arquivoCSV: fluxo do arquivo csv a partir do qual a verificação será feita
+@return int 1 se verdadeiro | 0 se falso
 */
 bool registroDoCSVEhRemovido(FILE *arquivoCSV) {
 
@@ -41,11 +41,10 @@ bool registroDoCSVEhRemovido(FILE *arquivoCSV) {
     return false;
 }
 
-
 /*
-    Lê todas as frases das descrições do campo cabeçalho de um arquivo csv e as retorna
-    @param stream: fluxo a partir do qual as frases serão lidas
-    @return char** conjunto das frases lidas
+Descrição: Lê todas as frases das descrições do campo cabeçalho de um arquivo csv e as retorna
+@param stream: fluxo a partir do qual as frases serão lidas
+@return char** conjunto das frases lidas
 */
 char **leDescricoesCabecalhoCSV(FILE *stream) {
 
@@ -76,11 +75,10 @@ char **leDescricoesCabecalhoCSV(FILE *stream) {
     return cabecalho;
 }
 
-
 /*
-    Lê uma string de um arquivo csv e a retorna
-    @param stream: fluxo a partir do qual a string será lida
-    @return char* string lida 
+Descrição: Lê uma string de um arquivo csv e a retorna
+@param stream: fluxo a partir do qual a string será lida
+@return char* string lida 
 */
 char *leStringDoCSV(FILE *stream) {
 
@@ -107,20 +105,26 @@ char *leStringDoCSV(FILE *stream) {
     return string;
 }
 
-
 /*
-    Lê um inteiro de um arquivo csv e o retorna
-    @param stream: fluxo a partir do qual o inteiro será lido
-    @return int inteiro lido 
+Descrição: Lê um inteiro de um arquivo csv e o retorna
+@param stream: fluxo a partir do qual o inteiro será lido
+@return int inteiro lido 
 */
 int leIntDoCSV(FILE *stream) {
 
     // Lendo inteiro na forma string:
     char *inteiroAscii = leStringDoCSV(stream);
 
-    if (inteiroAscii == NULL || !isdigit(inteiroAscii[0])) 
+    // Verificando se a leitura foi bem sucedida:
+    if (inteiroAscii == NULL)
         return -1;
     
+    // Verificando se o inteiro é inválido:
+    if (!isdigit(inteiroAscii[0])) {
+        free(inteiroAscii);
+        return -1;
+    }
+
     // Convertendo o inteiro para sua forma numérica:
     int inteiro = atoi(inteiroAscii);
     free(inteiroAscii);
@@ -129,17 +133,24 @@ int leIntDoCSV(FILE *stream) {
 }
 
 /*
-    Lê um long long de um arquivo csv e o retorna
-    @param stream: fluxo a partir do qual o long long será lido
-    @return long long ll lido 
+Descrição: Lê um long long de um arquivo csv e o retorna
+@param stream: fluxo a partir do qual o long long será lido
+@return long long ll lido 
 */
 long long leLongLongDoCSV(FILE *stream) {
 
     // Lendo long long na forma string:
     char *longlongAscii = leStringDoCSV(stream);
 
-    if (longlongAscii == NULL || !isdigit(longlongAscii[0]))
-        return -1;  
+    // Verificando se a leitura foi bem sucedida:
+    if (longlongAscii == NULL)
+        return -1;
+    
+    // Verificando se o long long é inválido:
+    if (!isdigit(longlongAscii[0])) {
+        free(longlongAscii);
+        return -1;
+    }
     
     // Convertendo o long long para sua forma numérica:
     long long longlongNumerico = atoll(longlongAscii);
@@ -148,11 +159,10 @@ long long leLongLongDoCSV(FILE *stream) {
     return longlongNumerico;
 }
 
-
 /*
-    Lê um caractere de um arquivo csv e o retorna
-    @param stream: fluxo a partir do qual o caractere será lido
-    @return char caractere lido 
+Descrição: Lê um caractere de um arquivo csv e o retorna
+@param stream: fluxo a partir do qual o caractere será lido
+@return char caractere lido 
 */
 char leCharDoCSV(FILE *stream) {
     

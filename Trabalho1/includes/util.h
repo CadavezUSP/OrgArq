@@ -6,7 +6,7 @@
     #include <string.h>
     #include <ctype.h>
 
-    char* VerMes(int num);
+    char* verMes(int num);
     void imprimeMensagemErro(FILE *stream);
     int fimDoArquivoBIN(FILE *arquivoBIN);
     void binarioNaTela(char *nomeArquivoBinario); 
