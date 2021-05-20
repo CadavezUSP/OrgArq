@@ -53,13 +53,26 @@ Descricao: Le os veiculos do arquivo binario e printa na tela os registros
 @param arquivoEntrada  nome do arquivo de entrada
 */
 void selectFromLinhas(char *arquivoEntrada) {
-    FILE* arquivoBin = fopen(arquivoEntrada, "rb"); //arquivo binario
-    CabecalhoLinha *Cabecalho = carregaCabecalhoLinhaDoBIN(arquivoBin);
+    FILE* arquivoBIN = fopen(arquivoEntrada, "rb"); //arquivo binario
+
+    // Abortando a funcionalidade se o arquivo de entrada não existir
+    if (arquivoBIN == NULL){
+        imprimeMensagemErro(stdout);
+        return;
+    }
+    CabecalhoLinha *Cabecalho = carregaCabecalhoLinhaDoBIN(arquivoBIN);
+    // Abortando a funcionalidade se o arquivo de entrada estiver inconsistente:
+    if (Cabecalho->status == '0') {
+        imprimeMensagemErro(stdout);
+        fclose(arquivoBIN);
+        free(Cabecalho);
+        return;
+    }
     int printouRegistro = 0;
     // enquanto nao for fim de aqruivo ler o registro e printar na tela
-    while (!fimDoArquivoBIN(arquivoBin))
+    while (!fimDoArquivoBIN(arquivoBIN))
     {
-        RegistroLinha *Reg = carregaRegistroLinhaDoBIN(arquivoBin);
+        RegistroLinha *Reg = carregaRegistroLinhaDoBIN(arquivoBIN);
         if (Reg->removido == '1') linhaNaTela(Reg, Cabecalho);
         free(Reg);
         printouRegistro =1;
@@ -68,7 +81,7 @@ void selectFromLinhas(char *arquivoEntrada) {
         printf("Registro inexistente.\n");
     }
     free(Cabecalho);
-    fclose(arquivoBin);
+    fclose(arquivoBIN);
     return;
 }
 
@@ -80,15 +93,28 @@ Descricao: faz uma busca sequencial no binario da Linha e retorna em todos os ar
 */
 void selectWhereLinhas(char *arquivoEntrada, char *campo, char *valor) {// Cadavez
     FILE *arquivoBIN = fopen(arquivoEntrada, "rb");
+
+    // Abortando a funcionalidade se o arquivo de entrada não existir
+    if (arquivoBIN == NULL){
+        imprimeMensagemErro(stdout);
+        return;
+    }
     CabecalhoLinha *cabecalho = carregaCabecalhoLinhaDoBIN(arquivoBIN);
+    // Abortando a funcionalidade se o arquivo de entrada estiver inconsistente:
+    if (cabecalho->status == '0') {
+        imprimeMensagemErro(stdout);
+        fclose(arquivoBIN);
+        free(cabecalho);
+        return;
+    }
     int printouRegistro = 0;
-    do {
+    while (!fimDoArquivoBIN(arquivoBIN)) {
         RegistroLinha *reg = localizaLinha(arquivoBIN, valor, campo);
         if (reg == NULL) break;
         linhaNaTela(reg, cabecalho);
         printouRegistro =1;
         free(reg);
-    } while (!fimDoArquivoBIN(arquivoBIN));
+    } 
     if (printouRegistro == 0){
         printf("Registro inexistente.\n");
     }

@@ -53,20 +53,40 @@ Descricao: Le os veiculos do arquivo binario e printa na tela os registros
 @param arquivoEntrada  nome do arquivo de entrada
 */
 void selectFromVeiculos(char *arquivoEntrada) { 
-    FILE* arquivoBin = fopen(arquivoEntrada, "rb"); // arquivo binario
-    CabecalhoVeiculo *Cabecalho = carregaCabecalhoVeiculoDoBIN(arquivoBin); // cabecalho
+    FILE* arquivoBIN = fopen(arquivoEntrada, "rb"); // arquivo binario
+
+    // Caso nao seja possivel abrir o arquivo retorna falha
+    if (arquivoBIN == NULL){
+        imprimeMensagemErro(stdout);
+        return;
+    }
+
+    // Carregando o registro de cabeçalho do arquivo binário para a memória:
+    CabecalhoVeiculo *Cabecalho = carregaCabecalhoVeiculoDoBIN(arquivoBIN);
+
+    // Abortando a funcionalidade se o arquivo de entrada estiver inconsistente:
+    if (Cabecalho->status == '0') {
+        imprimeMensagemErro(stdout);
+        fclose(arquivoBIN);
+        free(Cabecalho);
+    return;
+    }
     int printouRegistro = 0;
-    while (!fimDoArquivoBIN(arquivoBin))
+
+    //printando os registros
+    while (!fimDoArquivoBIN(arquivoBIN))
     {
-        RegistroVeiculo *Reg = carregaRegistroVeiculoDoBIN(arquivoBin);
+        RegistroVeiculo *Reg = carregaRegistroVeiculoDoBIN(arquivoBIN);
         if (Reg->removido == '1') veiculoNaTela(Reg, Cabecalho);
         printouRegistro =1;
         free(Reg);
     }
+
+    //verificando se algum registro foi printado
     if (printouRegistro == 0){
         printf("Registro inexistente.\n");
     }
-    fclose(arquivoBin);
+    fclose(arquivoBIN);
     free(Cabecalho);
 }
 
@@ -78,16 +98,36 @@ Descricao: faz uma busca sequencial no binario dos veiculos e retorna em todos o
 */
 void selectWhereVeiculos(char *arquivoEntrada, char *campo, char *valor) {//Cadavez
     FILE *arquivoBIN = fopen(arquivoEntrada, "rb");
+
+    // Caso nao seja possivel abrir o arquivo retorna falha
+    if (arquivoBIN == NULL){
+        imprimeMensagemErro(stdout);
+        return;
+    }
+
+    // Carregando o registro de cabeçalho do arquivo binário para a memória:
     CabecalhoVeiculo *cabecalho = carregaCabecalhoVeiculoDoBIN(arquivoBIN);
+    
+    // Abortando a funcionalidade se o arquivo de entrada estiver inconsistente:
+    if (cabecalho->status == '0') {
+        imprimeMensagemErro(stdout);
+        fclose(arquivoBIN);
+        free(cabecalho);
+        return;
+    }
     RegistroVeiculo *reg;
     int printouRegistro = 0;
-    do {
+    
+    //buscando e printando os registros
+    while (!fimDoArquivoBIN(arquivoBIN)) {
         reg = localizaVeiculo(arquivoBIN, valor, campo);
         if (reg == NULL) break;
         printouRegistro =1;
         veiculoNaTela(reg, cabecalho);
         free(reg);
-    } while (!fimDoArquivoBIN(arquivoBIN));
+    }
+
+    // verificando se algum registro foi printado
     if (printouRegistro == 0) {
         printf("Registro inexistente.\n");
     }

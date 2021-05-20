@@ -53,7 +53,7 @@ Imprime a mensagem "Falha no processamento do arquivo."
 @param stream fluxo no qual a mensagem será impressa
 */
 void imprimeMensagemErro(FILE *stream) {
-	fprintf(stream, "Falha no processamento do arquivo.");
+	fprintf(stream, "Falha no processamento do arquivo.\n");
 }
 
 /*
