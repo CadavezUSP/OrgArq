@@ -1,5 +1,10 @@
 #include "util.h"
 
+/*
+Descrição: obtém o mês do ano correspondente a partir de seu número
+@param num número do mês
+@return um ponteiro com uma cadeia de caracteres representando o mês correspondente
+*/
 char* verMes(int num){
     char *mes = malloc(15*sizeof(char));
     switch (num)
@@ -49,7 +54,7 @@ char* verMes(int num){
 }
 
 /*
-Imprime a mensagem "Falha no processamento do arquivo."
+Descrição: Imprime a mensagem "Falha no processamento do arquivo."
 @param stream fluxo no qual a mensagem será impressa
 */
 void imprimeMensagemErro(FILE *stream) {
@@ -57,7 +62,7 @@ void imprimeMensagemErro(FILE *stream) {
 }
 
 /*
-Verifica se o fluxo passado por parâmetro chegou ao seu fim
+Descrição: Verifica se o fluxo passado por parâmetro chegou ao seu fim
 @param arquivoBIN: fluxo do arquivo binário a ser verificado
 @return int 1 se verdadeiro | 0 se falso
 */

@@ -212,14 +212,21 @@ Descricao: Printa na tela o registro Linha segundo a forma indicada pelo cabecal
 @param cabecalho estrutura de cabecalho que será utilizada para printar
 */
 void linhaNaTela (RegistroLinha *Reg, CabecalhoLinha *cabecalho){
-    printf("%s: ", cabecalho->descreveCodigo);
-    printf("%d\n", Reg->codLinha);
+
+    // Imprimindo o campo código:
+    printf("%s: %d\n", cabecalho->descreveCodigo, Reg->codLinha);
+
+    // Imprimindo o campo nome:
     printf("%s: ", cabecalho->descreveNome);
     if (Reg->nomeLinha[0] != '\0') printf("%s\n", Reg->nomeLinha);
     else printf("campo com valor nulo\n");
+
+    // Imprimindo o campo cor:
     printf("%s: ", cabecalho->descreveCor);
     if (Reg->corLinha[0] != '\0') printf("%s\n", Reg->corLinha);
     else printf("campo com valor nulo\n");
+
+    // Imprimindo o campo aceita cartão:
     printf ("%s: ", cabecalho->descreveCartao);
     if (Reg->aceitaCartao != '\0') {
         switch (Reg->aceitaCartao)
@@ -239,34 +246,35 @@ void linhaNaTela (RegistroLinha *Reg, CabecalhoLinha *cabecalho){
         }
     }
     else printf("campo com  valor  nulo\n");
+
     printf("\n");
 }
 
 /*
-Descricao: localiza qual campo está sendo buscado e faz uma busca sequencial no binário retornando o registro que satisfaz a condicao de busca
+Descricao: define qual campo está sendo buscado e faz uma busca sequencial no binário, retornando o registro que satisfaz a condicao de busca
 @param arquivoBIN arquivo binario que será utilizado para busca
 @param valor valor buscado
 @param campo campo buscado
 @return Registro que possui o campo buscado com o valor fornecido, retorna NULL caso nada seja encontrado
 */
-RegistroLinha *localizaLinha(FILE *arquivoBIN, char* valor, char *campo){
-    if (strcmp("nomeLinha", campo) == 0){
+RegistroLinha *localizaLinha(FILE *arquivoBIN, char* valor, char *campo) {
+    if (strcmp("nomeLinha", campo) == 0) {
         while (!fimDoArquivoBIN(arquivoBIN))
         {
             RegistroLinha *reg = carregaRegistroLinhaDoBIN(arquivoBIN);
-            if (strcmp(reg->nomeLinha, valor)==0 && reg->removido == '1') return reg;
+            if (strcmp(reg->nomeLinha, valor) == 0 && reg->removido == '1') return reg;
             else free(reg);
         }
     }
-    else if(strcmp("corLinha", campo) ==0){
+    else if(strcmp("corLinha", campo) == 0) {
         while (!fimDoArquivoBIN(arquivoBIN))
         {
             RegistroLinha *reg = carregaRegistroLinhaDoBIN(arquivoBIN);
-            if (strcmp(reg->corLinha, valor)==0 && reg->removido == '1') return reg;
+            if (strcmp(reg->corLinha, valor) == 0 && reg->removido == '1') return reg;
             else free(reg);
         }
     }
-    else if(strcmp("codLinha" , campo) ==0){
+    else if(strcmp("codLinha" , campo) == 0) {
         int aux = atoi(valor);
         while (!fimDoArquivoBIN(arquivoBIN))
         {
@@ -275,7 +283,7 @@ RegistroLinha *localizaLinha(FILE *arquivoBIN, char* valor, char *campo){
             else free(reg);
         }
     }
-    else if (strcmp("aceitaCartao", campo) == 0){
+    else if (strcmp("aceitaCartao", campo) == 0) {
         char aux = valor[0];
         while (!fimDoArquivoBIN(arquivoBIN))
         {

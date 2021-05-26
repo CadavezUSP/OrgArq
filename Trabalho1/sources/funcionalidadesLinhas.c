@@ -1,9 +1,9 @@
 #include "funcionalidadesLinhas.h"
 
 /*
-Descrição: Cria um arquivo binário com dados contidos em um arquivo csv
-@param arquivoEntrada nome do arquivo csv de onde os dados serão estraídos
-@param arquivoSaida nome do arquivo binário no qual os dados serão escritos 
+Descrição: Lê vários registros de um arquivo de entrada e grava esses registros em um arquivo de saída
+@param arquivoEntrada nome do arquivo csv de onde os registros serão lidos
+@param arquivoSaida nome do arquivo binário no qual os registros serão gravados 
 */
 void createTableLinhas(char *arquivoEntrada, char *arquivoSaida) {
     
@@ -49,18 +49,23 @@ void createTableLinhas(char *arquivoEntrada, char *arquivoSaida) {
 }
 
 /*
-Descricao: Le os veiculos do arquivo binario e printa na tela os registros
-@param arquivoEntrada  nome do arquivo de entrada
+Descrição: Recupera todos os registros armazenados em um arquivo binário e os imprime na saída padrão 
+@param arquivoEntrada nome do arquivo binário de onde os registros serão recuperados 
 */
 void selectFromLinhas(char *arquivoEntrada) {
-    FILE* arquivoBIN = fopen(arquivoEntrada, "rb"); //arquivo binario
 
-    // Abortando a funcionalidade se o arquivo de entrada não existir
+    // Abrindo o arquivo binário para leitura:
+    FILE* arquivoBIN = fopen(arquivoEntrada, "rb");
+
+    // Abortando a funcionalidade se o arquivo de entrada não existir:
     if (arquivoBIN == NULL){
         imprimeMensagemErro(stdout);
         return;
     }
+
+    // Carregando o registro de cabeçalho do arquivo binário para a memória:
     CabecalhoLinha *Cabecalho = carregaCabecalhoLinhaDoBIN(arquivoBIN);
+
     // Abortando a funcionalidade se o arquivo de entrada estiver inconsistente:
     if (Cabecalho->status == '0') {
         imprimeMensagemErro(stdout);
@@ -68,38 +73,45 @@ void selectFromLinhas(char *arquivoEntrada) {
         free(Cabecalho);
         return;
     }
-    int printouRegistro = 0;
-    // enquanto nao for fim de aqruivo ler o registro e printar na tela
-    while (!fimDoArquivoBIN(arquivoBIN))
-    {
-        RegistroLinha *Reg = carregaRegistroLinhaDoBIN(arquivoBIN);
-        if (Reg->removido == '1') linhaNaTela(Reg, Cabecalho);
-        free(Reg);
-        printouRegistro =1;
+
+    // Lendo e imprimindo os registros na tela:
+    int printouRegistro = false;
+    while (!fimDoArquivoBIN(arquivoBIN)) {
+        RegistroLinha *reg = carregaRegistroLinhaDoBIN(arquivoBIN);
+        if (reg->removido == '1') linhaNaTela(reg, Cabecalho);
+        free(reg);
+        printouRegistro = true;
     }
-    if (printouRegistro == 0){
+
+    // Imprimindo "Registro inexistente" caso nenhum registro seja encontrado:
+    if (!printouRegistro)
         printf("Registro inexistente.\n");
-    }
+
+    // Liberando memória alocada e fechando o arquivo binário:
     free(Cabecalho);
     fclose(arquivoBIN);
-    return;
 }
 
 /*
-Descricao: faz uma busca sequencial no binario da Linha e retorna em todos os arquivos que satisfazem a condicao da busca
-@param arquivoEntrada nome do arquivo binario
+Descrição: Imprime na saída padrão os registros armazenados em um arquivo binário que satisfazem uma condição de busca
+@param arquivoEntrada nome do arquivo binário de onde os registros serão recuperados 
 @param campo nome do campo buscado
 @param valor valor do campo buscado
 */
-void selectWhereLinhas(char *arquivoEntrada, char *campo, char *valor) {// Cadavez
+void selectWhereLinhas(char *arquivoEntrada, char *campo, char *valor) {
+
+    // Abrindo o arquivo binário para leitura:
     FILE *arquivoBIN = fopen(arquivoEntrada, "rb");
 
-    // Abortando a funcionalidade se o arquivo de entrada não existir
+    // Abortando a funcionalidade se o arquivo de entrada não existir:
     if (arquivoBIN == NULL){
         imprimeMensagemErro(stdout);
         return;
     }
+
+    // Carregando o registro de cabeçalho do arquivo binário para a memória:
     CabecalhoLinha *cabecalho = carregaCabecalhoLinhaDoBIN(arquivoBIN);
+
     // Abortando a funcionalidade se o arquivo de entrada estiver inconsistente:
     if (cabecalho->status == '0') {
         imprimeMensagemErro(stdout);
@@ -107,20 +119,24 @@ void selectWhereLinhas(char *arquivoEntrada, char *campo, char *valor) {// Cadav
         free(cabecalho);
         return;
     }
-    int printouRegistro = 0;
+
+    // Lendo e imprimindo os registros na tela que satisfazem à condição de busca:
+    int printouRegistro = false;
     while (!fimDoArquivoBIN(arquivoBIN)) {
         RegistroLinha *reg = localizaLinha(arquivoBIN, valor, campo);
         if (reg == NULL) break;
         linhaNaTela(reg, cabecalho);
-        printouRegistro =1;
+        printouRegistro = true;
         free(reg);
     } 
-    if (printouRegistro == 0){
+
+    // Imprimindo "Registro inexistente" caso nenhum registro seja encontrado:
+    if (!printouRegistro)
         printf("Registro inexistente.\n");
-    }
+
+    // Liberando memória alocada e fechando o arquivo binário:
     fclose(arquivoBIN);
-    free (cabecalho);
-    return;
+    free(cabecalho);
 }
 
 /*
@@ -152,12 +168,11 @@ void insertIntoLinhas(char *arquivoEntrada, int numeroRegistros) {
 
     // Atualizando o registro de cabeçalho no arquivo binário:
     cabecalho->status = '0';
-    escreveCabecalhoLinhaNoBIN(cabecalho, arquivoBIN);
-
-    // Posicionando o cursor no fim do arquivo:
-    fseek(arquivoBIN, 0, SEEK_END);
+    fseek(arquivoBIN, 0, SEEK_SET);
+    fwrite(&cabecalho->status, 1, 1, arquivoBIN);
 
     // Inserindo os registros lidos da entrada padrão:
+    fseek(arquivoBIN, 0, SEEK_END);
     for (int i = 0; i < numeroRegistros; i++) {
         RegistroLinha *registroAtual = carregaRegistroLinhaDaStdin();
         escreveRegistroLinhaNoBIN(registroAtual, arquivoBIN);

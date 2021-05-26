@@ -1,9 +1,9 @@
 #include "funcionalidadesVeiculos.h"
 
 /*
-Descrição: Cria um arquivo binário com dados contidos em um arquivo csv
-@param arquivoEntrada nome do arquivo csv de onde os dados serão estraídos
-@param arquivoSaida nome do arquivo binário no qual os dados serão escritos 
+Descrição: Lê vários registros de um arquivo de entrada e grava esses registros em um arquivo de saída
+@param arquivoEntrada nome do arquivo csv de onde os registros serão lidos
+@param arquivoSaida nome do arquivo binário no qual os registros serão gravados 
 */
 void createTableVeiculos(char *arquivoEntrada, char *arquivoSaida) {
     
@@ -49,19 +49,21 @@ void createTableVeiculos(char *arquivoEntrada, char *arquivoSaida) {
 }
 
 /*
-Descricao: Le os veiculos do arquivo binario e printa na tela os registros
-@param arquivoEntrada  nome do arquivo de entrada
+Descrição: Recupera todos os registros armazenados em um arquivo binário e os imprime na saída padrão 
+@param arquivoEntrada nome do arquivo binário de onde os registros serão recuperados 
 */
 void selectFromVeiculos(char *arquivoEntrada) { 
-    FILE* arquivoBIN = fopen(arquivoEntrada, "rb"); // arquivo binario
 
-    // Caso nao seja possivel abrir o arquivo retorna falha
+    // Abrindo o arquivo binário para leitura:
+    FILE* arquivoBIN = fopen(arquivoEntrada, "rb");
+
+    // Abortando a funcionalidade se o arquivo de entrada não existir:
     if (arquivoBIN == NULL){
         imprimeMensagemErro(stdout);
         return;
     }
 
-    // Carregando o registro de cabeçalho do arquivo binário para a memória:
+    // Obtendo o registro de cabeçalho do arquivo binário:
     CabecalhoVeiculo *Cabecalho = carregaCabecalhoVeiculoDoBIN(arquivoBIN);
 
     // Abortando a funcionalidade se o arquivo de entrada estiver inconsistente:
@@ -69,37 +71,39 @@ void selectFromVeiculos(char *arquivoEntrada) {
         imprimeMensagemErro(stdout);
         fclose(arquivoBIN);
         free(Cabecalho);
-    return;
-    }
-    int printouRegistro = 0;
-
-    //printando os registros
-    while (!fimDoArquivoBIN(arquivoBIN))
-    {
-        RegistroVeiculo *Reg = carregaRegistroVeiculoDoBIN(arquivoBIN);
-        if (Reg->removido == '1') veiculoNaTela(Reg, Cabecalho);
-        printouRegistro =1;
-        free(Reg);
+        return;
     }
 
-    //verificando se algum registro foi printado
-    if (printouRegistro == 0){
+    // Lendo e imprimindo os registros na tela:
+    int printouRegistro = false;
+    while (!fimDoArquivoBIN(arquivoBIN)) {
+        RegistroVeiculo *reg = carregaRegistroVeiculoDoBIN(arquivoBIN);
+        if (reg->removido == '1') veiculoNaTela(reg, Cabecalho);
+        printouRegistro = true;
+        free(reg);
+    }
+
+    // Imprimindo "Registro inexistente" caso nenhum registro seja encontrado:
+    if (!printouRegistro)
         printf("Registro inexistente.\n");
-    }
+
+    // Fechando o arquivo binário e liberando memória alocada:
     fclose(arquivoBIN);
     free(Cabecalho);
 }
 
 /*
-Descricao: faz uma busca sequencial no binario dos veiculos e retorna em todos os arquivos que satisfazem a condicao da busca
-@param arquivoEntrada nome do arquivo binario
+Descrição: Imprime na saída padrão os registros armazenados em um arquivo binário que satisfazem uma condição de busca
+@param arquivoEntrada nome do arquivo binário de onde os registros serão recuperados 
 @param campo nome do campo buscado
 @param valor valor do campo buscado
 */
-void selectWhereVeiculos(char *arquivoEntrada, char *campo, char *valor) {//Cadavez
+void selectWhereVeiculos(char *arquivoEntrada, char *campo, char *valor) {
+
+    // Abrindo o arquivo binário para leitura:
     FILE *arquivoBIN = fopen(arquivoEntrada, "rb");
 
-    // Caso nao seja possivel abrir o arquivo retorna falha
+    // Abortando a funcionalidade se o arquivo de entrada não existir:
     if (arquivoBIN == NULL){
         imprimeMensagemErro(stdout);
         return;
@@ -115,22 +119,22 @@ void selectWhereVeiculos(char *arquivoEntrada, char *campo, char *valor) {//Cada
         free(cabecalho);
         return;
     }
-    RegistroVeiculo *reg;
-    int printouRegistro = 0;
-    
-    //buscando e printando os registros
+
+    // Lendo e imprimindo os registros na tela que satisfazem à condição de busca:
+    int printouRegistro = false;
     while (!fimDoArquivoBIN(arquivoBIN)) {
-        reg = localizaVeiculo(arquivoBIN, valor, campo);
+        RegistroVeiculo *reg = localizaVeiculo(arquivoBIN, valor, campo);
         if (reg == NULL) break;
-        printouRegistro =1;
+        printouRegistro = true;
         veiculoNaTela(reg, cabecalho);
         free(reg);
     }
 
-    // verificando se algum registro foi printado
-    if (printouRegistro == 0) {
+    // Imprimindo "Registro inexistente" caso nenhum registro seja encontrado:
+    if (printouRegistro == 0)
         printf("Registro inexistente.\n");
-    }
+
+    // Liberando memória alocada e fechando o arquivo binário:
     fclose(arquivoBIN);
     free(cabecalho);
 }
@@ -164,12 +168,11 @@ void insertIntoVeiculos(char *arquivoEntrada, int numeroRegistros) {
 
     // Atualizando o registro de cabeçalho no arquivo binário:
     cabecalho->status = '0';
-    escreveCabecalhoVeiculoNoBIN(cabecalho, arquivoBIN);
-
-    // Posicionando o cursor no fim do arquivo:
-    fseek(arquivoBIN, 0, SEEK_END);
+    fseek(arquivoBIN, 0, SEEK_SET);
+    fwrite(&cabecalho->status, 1, 1, arquivoBIN);
 
     // Inserindo os registros lidos da entrada padrão:
+    fseek(arquivoBIN, 0, SEEK_END);
     for (int i = 0; i < numeroRegistros; i++) {
         RegistroVeiculo *registroAtual = carregaRegistroVeiculoDaStdin();
         escreveRegistroVeiculoNoBIN(registroAtual, arquivoBIN);

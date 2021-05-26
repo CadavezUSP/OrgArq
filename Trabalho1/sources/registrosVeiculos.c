@@ -257,14 +257,21 @@ Descricao: Printa na tela o registro veiculos segundo a forma indicada pelo cabe
 @param cabecalho estrutura de cabecalho que será utilizada para printar
 */
 void veiculoNaTela(RegistroVeiculo *Reg, CabecalhoVeiculo *cabecalho) {
-    printf("%s: ", cabecalho->descrevePrefixo);
-    printf("%s\n", Reg->prefixo);
+
+    // Imprimindo campo prefixo:
+    printf("%s: %s\n", cabecalho->descrevePrefixo, Reg->prefixo);
+
+    // Imprimindo campo modelo:
     printf("%s: ", cabecalho->descreveModelo);
     if (Reg->modelo[0] != '\0') printf("%s\n", Reg->modelo);
     else printf("campo com valor nulo\n");
+
+    // Imprimindo campo categoria:
     printf ("%s: ", cabecalho->descreveCategoria);
     if (Reg->categoria[0] != '\0') printf("%s\n", Reg->categoria);
     else printf("campo com valor nulo\n");
+
+    // Imprimindo campo data:
     printf("%s: ", cabecalho->descreveData);
     if (Reg->data[0] != '\0'){
         int ano = atoi (Reg->data);
@@ -276,11 +283,13 @@ void veiculoNaTela(RegistroVeiculo *Reg, CabecalhoVeiculo *cabecalho) {
         free(mes);
     }
     else printf("campo com valor nulo\n");
+
+    // Imprimindo campo lugares:
     printf("%s: ", cabecalho->descreveLugares);
-    if (Reg->quantidadeLugares != -1){
+    if (Reg->quantidadeLugares != -1)
         printf ("%d\n", Reg->quantidadeLugares);
-    }
     else printf("campo com valor nulo\n");
+
     printf("\n");
 }
 
