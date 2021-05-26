@@ -32,7 +32,7 @@ void createTableVeiculos(char *arquivoEntrada, char *arquivoSaida) {
         free(registroAtual);
     }
 
-    // Atualizando o arquivo de cabeçalho:
+    // Atualizando o registro de cabeçalho:
     cabecalho->status = '1';
     cabecalho->byteProxReg = ftell(arquivoBIN);
     escreveCabecalhoVeiculoNoBIN(cabecalho, arquivoBIN);
