@@ -20,9 +20,9 @@
     bool fimDoArquivoCSV(FILE *stream);
     bool registroDoCSVEhRemovido(FILE *arquivoCSV);
     char **leDescricoesCabecalhoCSV(FILE *stream);
+    char *leStringDoCSV(FILE *stream);
     int leIntDoCSV(FILE *stream);
     long long leLongLongDoCSV(FILE *stream);
     char leCharDoCSV(FILE *stream);
-    char *leStringDoCSV(FILE *stream);
 
 #endif
