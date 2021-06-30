@@ -1,3 +1,6 @@
+// - Felipe Cadavez Oliveira (11208558)
+// - Luiz Fernando Rabelo (11796893)
+
 #ifndef __FUNCIONALIDADES_LINHAS_H__
     #define __FUNCIONALIDADES_LINHAS_H__
 
@@ -12,7 +15,7 @@
     #define INSERT_INTO_LINHAS 14
 
     void createIndexLinhas(char *nomeArquivoDados, char *nomeArquivoIndice);
-    void selectWhereLinhas(char *nomeArquivoDados, char *nomeArquivoIndice, char *campo, char *valor);
+    void selectWhereLinhas(char *nomeArquivoDados, char *nomeArquivoIndice, char *campo, int valor);
     void insertIntoLinhas(char *nomeArquivoDados, char *nomeArquivoIndice, int numeroRegistros);
 
 #endif

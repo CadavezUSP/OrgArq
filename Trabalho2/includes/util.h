@@ -1,3 +1,6 @@
+// - Felipe Cadavez Oliveira (11208558)
+// - Luiz Fernando Rabelo (11796893)
+
 #ifndef __UTIL_H__
     #define __UTIL_H__
 

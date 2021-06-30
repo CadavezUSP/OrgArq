@@ -1,3 +1,6 @@
+// - Felipe Cadavez Oliveira (11208558)
+// - Luiz Fernando Rabelo (11796893)
+
 #ifndef __REGISTROS_LINHAS_H__
     #define __REGISTROS_LINHAS_H__
 

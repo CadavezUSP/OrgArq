@@ -1,3 +1,6 @@
+// - Felipe Cadavez Oliveira (11208558)
+// - Luiz Fernando Rabelo (11796893)
+
 #ifndef __ARVORE_B__
     #define __ARVORE_B__
     
@@ -43,13 +46,13 @@
         int chave;
         long long byteOffset;
         int RRNfilhoDireita;
-    }ChavePromovida;
+    }RegistroPromovido;
 
     NoCabecalhoAB *carregaNoCabecalhoDaAB(FILE *arquivoIndice);
     void escreveNoCabecalhoNaAB(FILE *arquivoIndice, NoCabecalhoAB *cabecalho);
-
     void insereRegistroDadosNaAB(FILE *arquivoIndice, NoCabecalhoAB *cabecalho, int chaveInserida, long long byteOffset);
     int buscaRegistroDadosNaAB(FILE *arquivoIndice, NoCabecalhoAB *cabecalho, int chaveBuscada);
 
-void imprimeArvore(FILE *arquivoIndice);
+    // Função para debugar, vamos retirá-la
+    void imprimeArvore(FILE *arquivoIndice);
 #endif

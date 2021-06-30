@@ -1,3 +1,6 @@
+// - Felipe Cadavez Oliveira (11208558)
+// - Luiz Fernando Rabelo (11796893)
+
 #include "arvoreB.h"
 
 /*
@@ -33,6 +36,17 @@ RegistroDadosAB **alocaVetorRegistroDadosAB(int nroRegistros) {
 }
 
 /*
+Descrição: Libera a memória alocada para um vetor de ponteiros para estruturas do tipo RegistroDadosAB
+@param vetor: vetor a ser liberado
+@param nroRegistros: número de ponteiros presentes no vetor
+*/
+void liberaVetorRegistroDadosAB(RegistroDadosAB **vetor, int nroRegistros) {
+    for (int i = 0; i < nroRegistros; i++)
+        free(vetor[i]);
+    free(vetor);
+}
+
+/*
 Descrição: Aloca espaço na memória para uma estrutura do tipo NoDadosAB, 
 inicializando os campos folha com '1' (verdadeiro), nroChavesIndexadas com 0,  
 RRNdoNo com VALOR_NULO (-1), registros com ponteiros preenchidos pela função 
@@ -56,6 +70,16 @@ NoDadosAB *alocaNoDadosAB(void) {
 }
 
 /*
+Descrição: Libera a memória alocada por um nó de dados da árvore B
+@param noDados: nó de dados a ser liberado
+*/
+void liberaNoDadosAB(NoDadosAB *noDados) {
+    for (int i = 0; i < (ORDEM_ARVORE-1); i++)
+        free(noDados->registros[i]);
+    free(noDados);
+}
+
+/*
 Descrição: Aloca espaço na memória para uma estrutura do tipo NoCabecalhoAB, 
 inicializando os campos RRNraiz com VALOR_NULO (-1), RRNproxNo com 0, status 
 com '0' (arquivo inconsistente) e lixo com 68 bytes '\@' 
@@ -74,19 +98,19 @@ NoCabecalhoAB *alocaNoCabecalhoAB(void) {
 }
 
 /*
-Descrição: Aloca espaço na memória para uma estrutura do tipo ChavePromovida, 
+Descrição: Aloca espaço na memória para uma estrutura do tipo RegistroPromovido, 
 inicializando todos os seus campos com VALOR_NULO (-1)
 @return Um ponteiro para a região de memória em que o a chave promovida foi alocada
 */
-ChavePromovida *alocaChavePromovidaAB(void) {
+RegistroPromovido *alocaRegistroPromovidoAB(void) {
 
-    ChavePromovida *chavePromovida = malloc(sizeof(ChavePromovida));
+    RegistroPromovido *registroPromovido = malloc(sizeof(RegistroPromovido));
 
-    chavePromovida->chave = VALOR_NULO;
-    chavePromovida->byteOffset = VALOR_NULO;
-    chavePromovida->RRNfilhoDireita = VALOR_NULO;
+    registroPromovido->chave = VALOR_NULO;
+    registroPromovido->byteOffset = VALOR_NULO;
+    registroPromovido->RRNfilhoDireita = VALOR_NULO;
 
-    return chavePromovida;
+    return registroPromovido;
 }
 
 /*
@@ -201,6 +225,11 @@ void escreveNoDadosNaAB(FILE *arquivoIndice, NoDadosAB *noDados) {
 }
 
 
+
+
+
+// ======================== Início de funções de impressão para debugar ========================
+
 void imprimeNoCabecalho(NoCabecalhoAB *noCabecalho) {
     printf("Status: %c\n", noCabecalho->status);
     printf("NoRaiz: %d\n", noCabecalho->RRNraiz);
@@ -230,83 +259,118 @@ void imprimeArvore(FILE *arquivoIndice) {
     printf("\n");
 }
 
-//void split(FILE *arquivoIndice, int chaveInserida, long long byteOffset,
-void split(FILE *arquivoIndice, NoDadosAB *paginaAtual, NoDadosAB *paginaNova, ChavePromovida *chavePromovida) {
+// ============================= Fim das funções para debugar =============================
 
-    ////printf("Declarando copias\n");
+
+
+
+
+/*
+Descrição: Insere um registro no arquivo de índice e rearranja as chaves de um nó cheio, 
+movendo a metade maior para um nó com espaço. Por fim, sobrescreve o valor do parâmetro 
+registroPromovido com os dados do registro que foi promovido durante a operação de split
+@param arquivoIndice: arquivo de índice referente ao split realizado
+@param noCheio: nó cheio que precisa ser "splitado"
+@param noComEspaco: nó que tem espaço para receber metade das chaves do nó cheio
+@param registroPromovido: registro promovido do nível inferior da função de inserção recursiva 
+a ser inserido na operação de split
+*/
+void split(FILE *arquivoIndice, NoDadosAB *noCheio, NoDadosAB *noComEspaco, RegistroPromovido *registroPromovido) {
+
+    // Inicializando um vetor de registros e um vetor de filhos para serem preenchidos
+    // com as cópias dos registros e filhos do nó cheio. Ambos possuem 1 posição extra:
     RegistroDadosAB **copiaRegistros = alocaVetorRegistroDadosAB(ORDEM_ARVORE);
     int copiaFilhos[(ORDEM_ARVORE+1)];
     memset(copiaFilhos, VALOR_NULO, (ORDEM_ARVORE+1) * sizeof(int));
 
-    ////printf("Copiando 1\n");
-    copiaFilhos[0] = paginaAtual->filhos[0];
+    // Preenchendo os vetores de cópia de registros e filhos:
+    copiaFilhos[0] = noCheio->filhos[0];
     for (int i = 0; i < ORDEM_ARVORE - 1; i++) {
-        copiaRegistros[i]->chave = paginaAtual->registros[i]->chave;
-        copiaRegistros[i]->byteOffset = paginaAtual->registros[i]->byteOffset;
-        copiaFilhos[i+1] = paginaAtual->filhos[i+1];
+        copiaRegistros[i]->chave = noCheio->registros[i]->chave;
+        copiaRegistros[i]->byteOffset = noCheio->registros[i]->byteOffset;
+        copiaFilhos[i+1] = noCheio->filhos[i+1];
     }
 
-    ////printf("Encontrando idx insercao\n");
+    // Encontrando o índice de inserção da chave:
     int indiceInsercao;
     for (indiceInsercao = 0; indiceInsercao < ORDEM_ARVORE - 1; indiceInsercao++) {
-        //if (chavePromovida->chave < copiaRegistros[indiceInsercao]->chave)
-        if (chavePromovida->chave < copiaRegistros[indiceInsercao]->chave)
+        if (registroPromovido->chave < copiaRegistros[indiceInsercao]->chave)
             break;
     }
 
-    ////printf("shiftando\n");
+    // Shiftando as cópias dos registros e filhos para o registro ser inserido na posição correta:
     for (int i = (ORDEM_ARVORE-1); i > indiceInsercao; i--) {
         copiaRegistros[i]->chave = copiaRegistros[i-1]->chave;
         copiaRegistros[i]->byteOffset = copiaRegistros[i-1]->byteOffset;
         copiaFilhos[i+1] = copiaFilhos[i];
     }
 
-    ////printf("Atribuindo chave\n");
-    copiaRegistros[indiceInsercao]->chave = chavePromovida->chave;
-    copiaRegistros[indiceInsercao]->byteOffset = chavePromovida->byteOffset;
-    copiaFilhos[indiceInsercao+1] = chavePromovida->RRNfilhoDireita;
+    // Preenchendo os dados do registro e do filho da direita na posição adequada dos vetores de cópia:
+    copiaRegistros[indiceInsercao]->chave = registroPromovido->chave;
+    copiaRegistros[indiceInsercao]->byteOffset = registroPromovido->byteOffset;
+    copiaFilhos[indiceInsercao+1] = registroPromovido->RRNfilhoDireita;
 
-    //printf("Na copia, o indice de cp é %d e seu valor é %d\n", indiceInsercao, chavePromovida->chave);
+    /*  OBS: Nas linhas que precedem esse comentário registroPromovido guarda os dados do registro a ser 
+        inserido no arquivo de índice. Uma vez inserido, ele passará a guardar os dados do registro que foi 
+        promovido ao nível superior da árvore, para que ele possa ser acessado na função de inserção recuriva. */
 
-    //printf("Preenchendo promovida\n");
-    chavePromovida->chave = copiaRegistros[(ORDEM_ARVORE/2)]->chave;
-    chavePromovida->byteOffset = copiaRegistros[(ORDEM_ARVORE/2)]->byteOffset;
-    chavePromovida->RRNfilhoDireita = paginaNova->RRNdoNo;
+    // Atribuindo os valores para o registro que deve ser promovido (o que está na posição central das cópias):
+    registroPromovido->chave = copiaRegistros[(ORDEM_ARVORE/2)]->chave;
+    registroPromovido->byteOffset = copiaRegistros[(ORDEM_ARVORE/2)]->byteOffset;
+    registroPromovido->RRNfilhoDireita = noComEspaco->RRNdoNo;
 
-    //printf("Copia metade 1\n");
-    paginaAtual->filhos[0] = copiaFilhos[0];
+    // Copiando a primeira metade das chaves/filhos ordenados dos vetores de cópia para a primeira metade do nó cheio:
+    noCheio->filhos[0] = copiaFilhos[0];
     for (int i = 0; i < (ORDEM_ARVORE/2); i++) {
-        paginaAtual->registros[i]->chave = copiaRegistros[i]->chave;
-        paginaAtual->registros[i]->byteOffset = copiaRegistros[i]->byteOffset;
-        paginaAtual->filhos[i+1] = copiaFilhos[i+1];
+        noCheio->registros[i]->chave = copiaRegistros[i]->chave;
+        noCheio->registros[i]->byteOffset = copiaRegistros[i]->byteOffset;
+        noCheio->filhos[i+1] = copiaFilhos[i+1];
     }
 
-    //printf("Copia metade 2\n");
-    paginaNova->filhos[0] = copiaFilhos[(ORDEM_ARVORE/2+1)];
+    // Copiando a segunda metade das chaves/filhos ordenados dos vetores de cópia para a primeira metade do nó com espaço:
+    noComEspaco->filhos[0] = copiaFilhos[(ORDEM_ARVORE/2+1)];
     for (int i = (ORDEM_ARVORE/2+1), j = 0; i < (ORDEM_ARVORE); i++, j++) {
-        paginaNova->registros[j]->chave = copiaRegistros[i]->chave;
-        paginaNova->registros[j]->byteOffset = copiaRegistros[i]->byteOffset;
-        paginaNova->filhos[j+1] = copiaFilhos[i+1];
+        noComEspaco->registros[j]->chave = copiaRegistros[i]->chave;
+        noComEspaco->registros[j]->byteOffset = copiaRegistros[i]->byteOffset;
+        noComEspaco->filhos[j+1] = copiaFilhos[i+1];
     }
 
-    //printf("Atribuindo nroChavesIndexadas\n");
-    paginaAtual->nroChavesIndexadas = (ORDEM_ARVORE/2);
-    paginaNova->nroChavesIndexadas = (ORDEM_ARVORE/2);
+    // Atualizando o número de chaves indexadas pelos nós (metade do total):
+    noCheio->nroChavesIndexadas = (ORDEM_ARVORE/2);
+    noComEspaco->nroChavesIndexadas = (ORDEM_ARVORE/2);
+
+    // Liberando memória extra alocada:
+    liberaVetorRegistroDadosAB(copiaRegistros, ORDEM_ARVORE);
 }
 
-
-bool insereRegistroDadosNaABrec(FILE *arquivoIndice, NoCabecalhoAB *noCabecalho, int RRNatual,
-                                int chaveInserida, long long byteOffset, ChavePromovida *chavePromovida)
+/*
+Descrição: chama a si mesmo recursivamente a fim de inserir uma chave/byteoffset 
+relativos a um registro em um arquivo de índice
+@param arquivoIndice: arquivo de índice em que a chave/byteoffset serão inseridos
+@param noCabecalho: nó de cabeçalho do arquivo de índice
+@param RRNatual: RRN do nó atual da recursão (começa pela raíz)
+@param chaveInserida: chave a ser inserida
+@param byteOffset: byte offset da chave a ser inserida
+@param registroPromovido: registro promovido do nível inferior da recursão (começa com valores nulos)
+@return int 1 se precisar ser feita uma promoção ou 0 se não precisar ser feita nenhuma remoção
+*/
+bool insereRegistroRecursao(FILE *arquivoIndice, NoCabecalhoAB *noCabecalho, int RRNatual,
+                            int chaveInserida, long long byteOffset, RegistroPromovido *registroPromovido)
 {
+    // Caso base da recursão: se o RRN atual for nulo, o nó do nível superior
+    // é um nó folha, e, portanto, é nele em que a chave deve ser inserida.
     if (RRNatual == VALOR_NULO) {
-        chavePromovida->chave = chaveInserida;
-        chavePromovida->byteOffset = byteOffset;
-        chavePromovida->RRNfilhoDireita = VALOR_NULO;
+        // Inicializando os campos do registro promovido para que ele possa ser inserido:
+        registroPromovido->chave = chaveInserida;
+        registroPromovido->byteOffset = byteOffset;
+        registroPromovido->RRNfilhoDireita = VALOR_NULO;
         return true;
     }
 
+    // Carregando o nó do RRN atual do arquivo de índice para a memória:
     NoDadosAB *noAtual = carregaNoDadosDaAB(arquivoIndice, RRNatual);
 
+    // Obtendo a posição que a chave inserida deveria ocupar no nó atual:
     int indiceInsercao;
     for (indiceInsercao = 0; indiceInsercao < noAtual->nroChavesIndexadas; indiceInsercao++) {
         int chaveAtual = noAtual->registros[indiceInsercao]->chave;
@@ -314,83 +378,112 @@ bool insereRegistroDadosNaABrec(FILE *arquivoIndice, NoCabecalhoAB *noCabecalho,
             break;
     }
 
-    bool promocao = insereRegistroDadosNaABrec(arquivoIndice, noCabecalho, noAtual->filhos[indiceInsercao],
-                                            chaveInserida, byteOffset, chavePromovida);
+    // Chamando a recursão e verificando se há alguma promoção a ser feita:
+    bool promocao = insereRegistroRecursao(arquivoIndice, noCabecalho, noAtual->filhos[indiceInsercao],
+                                           chaveInserida, byteOffset, registroPromovido);
 
     // Se houver promoção a ser feita, não há mais nada a ser feito e a função deve retornar falso ao nível anterior:
-    if (!promocao)
-        return false;
-    
+    if (!promocao) {
+        liberaNoDadosAB(noAtual);
+        return false; // sem promoção
+    }
+
+    // Senão, o programa chegar nessa linha, e há uma promoção a ser feita: o registroPromovido deve ser inserido no nó atual
+
+    // Se o nó atual tiver espaço, a chave é inserida normalmente:
     if (noAtual->nroChavesIndexadas < (ORDEM_ARVORE - 1)) {
+        // Shiftando os registros/filhos do nó atual:
         for (int i = noAtual->nroChavesIndexadas; i > indiceInsercao; i--) {
             noAtual->registros[i]->chave = noAtual->registros[i-1]->chave;
             noAtual->registros[i]->byteOffset = noAtual->registros[i-1]->byteOffset;
             noAtual->filhos[i+1] = noAtual->filhos[i];
         }
-        noAtual->registros[indiceInsercao]->chave = chavePromovida->chave;
-        noAtual->registros[indiceInsercao]->byteOffset = chavePromovida->byteOffset;
-        noAtual->filhos[indiceInsercao+1] = chavePromovida->RRNfilhoDireita;
+        // Inserindo o registro no índice de inserção adequado:
+        noAtual->registros[indiceInsercao]->chave = registroPromovido->chave;
+        noAtual->registros[indiceInsercao]->byteOffset = registroPromovido->byteOffset;
+        noAtual->filhos[indiceInsercao+1] = registroPromovido->RRNfilhoDireita;
         noAtual->nroChavesIndexadas += 1;
-
         noAtual->folha = noAtual->filhos[0] == VALOR_NULO ? '1' : '0';
-
+        // Atualizando o nó atual no arquivo de índice:
         escreveNoDadosNaAB(arquivoIndice, noAtual);
-        //printf("Coube %d no no de rrn %d\n", chaveInserida, RRNatual);
-        return false;
+        // Liberando memória alocada:
+        liberaNoDadosAB(noAtual);
+        return false; // sem nova promoção
     }
 
+    // Senão, como o nó atual não tem espaço, deve ser realizada uma operação de split
+
+    // Inicializando o nó extra splitado que receberá metade das chaves do nó atual:
     NoDadosAB *noNovo = alocaNoDadosAB();
     noNovo->RRNdoNo = noCabecalho->RRNproxNo++;
     noNovo->folha = noAtual->folha;
 
-    //insereRegistroDadosNaABsplit(arquivoIndice, chaveInserida, byteOffset, noAtual, noNovo, chavePromovida);
-    split(arquivoIndice, noAtual, noNovo, chavePromovida);
+    // Realizando a operação de split:
+    split(arquivoIndice, noAtual, noNovo, registroPromovido);
 
+    // Atualizando o nó atual e inserindo o nó novo no arquivo de índice:
     escreveNoDadosNaAB(arquivoIndice, noAtual);
     escreveNoDadosNaAB(arquivoIndice, noNovo);
 
-    //printf("Fiz um split para inserir %d. Rrn atual eh %d e o novo %d.\n", chaveInserida, RRNatual, noNovo->RRNdoNo);
+    // Liberando memória alocada:
+    liberaNoDadosAB(noAtual);
+    liberaNoDadosAB(noNovo);
 
-    return true;
+    return true; // há uma promoção a ser feita
 }
 
+/*
+Descrição: insere um par chave/byteOffset em um arquivo de índice
+@param arquivoIndice: arquivo de índice em que a inserção será feita
+@param noCabecalho: nó cabecalho do arquivo de índice
+@param chaveInserida: chave a ser inserida
+@param byteOffset: byteOffset relativo à chave inserida
+*/
 void insereRegistroDadosNaAB(FILE *arquivoIndice, NoCabecalhoAB *noCabecalho, int chaveInserida, long long byteOffset) {
 
+    // Se a raiz tiver um valor nulo, o arquivo de índice deve ser inicializado 
     if (noCabecalho->RRNraiz == VALOR_NULO) {
+        // Preenchendo os dados da primeira raiz:
         NoDadosAB *primeiraRaiz = alocaNoDadosAB();
         primeiraRaiz->nroChavesIndexadas += 1;
         primeiraRaiz->RRNdoNo = noCabecalho->RRNproxNo++;
         primeiraRaiz->registros[0]->chave = chaveInserida;
         primeiraRaiz->registros[0]->byteOffset = byteOffset;
         noCabecalho->RRNraiz = primeiraRaiz->RRNdoNo;
+        // Atualizando o arquivo de índice:
         escreveNoCabecalhoNaAB(arquivoIndice, noCabecalho);
         escreveNoDadosNaAB(arquivoIndice, primeiraRaiz);
-        //printf("Inseri a primeira raiz\n");
-        //imprimeArvore(arquivoIndice);
+        // Liberando primeiraRaiz da memória:
+        liberaNoDadosAB(primeiraRaiz);
         return;
     }
 
-    ChavePromovida *chavePromovida = alocaChavePromovidaAB();
+    // Inicializando o ponteiro de registroPromovido, que será usado na função de inserção recursiva:
+    RegistroPromovido *registroPromovido = alocaRegistroPromovidoAB();
 
-    bool promocao = insereRegistroDadosNaABrec(arquivoIndice, noCabecalho, noCabecalho->RRNraiz,
-                                               chaveInserida, byteOffset, chavePromovida);
+    // Inserindo a chave e o byteOffset e verificando se deve ser feita a promoção da raíz:
+    bool promocao = insereRegistroRecursao(arquivoIndice, noCabecalho, noCabecalho->RRNraiz,
+                                           chaveInserida, byteOffset, registroPromovido);
 
+    // Se a raíz for promovida, seu valor deve ser atualizado:
     if (promocao) {
+        // Atualizando os dados do novo nó raíz e do cabeçalho:
         NoDadosAB *novoNoRaiz = alocaNoDadosAB();
         novoNoRaiz->folha = '0';
         novoNoRaiz->nroChavesIndexadas = 1;
         novoNoRaiz->RRNdoNo = noCabecalho->RRNproxNo++;
-        //printf("A raiz foi trocada, seu novo RRN vale %d\n", novoNoRaiz->RRNdoNo);
-        novoNoRaiz->registros[0]->chave = chavePromovida->chave;
-        novoNoRaiz->registros[0]->byteOffset = chavePromovida->byteOffset;
+        novoNoRaiz->registros[0]->chave = registroPromovido->chave;
+        novoNoRaiz->registros[0]->byteOffset = registroPromovido->byteOffset;
         novoNoRaiz->filhos[0] = noCabecalho->RRNraiz;
-        novoNoRaiz->filhos[1] = chavePromovida->RRNfilhoDireita;
+        novoNoRaiz->filhos[1] = registroPromovido->RRNfilhoDireita;
         noCabecalho->RRNraiz = novoNoRaiz->RRNdoNo;
+        // Atualizando o arquivo de índice e liberando nova raiz da memória:
         escreveNoCabecalhoNaAB(arquivoIndice, noCabecalho);
         escreveNoDadosNaAB(arquivoIndice, novoNoRaiz);
     }
 
-    //imprimeArvore(arquivoIndice);
+    // Liberando memória alocada:
+    free(registroPromovido);
 }
 
 
