@@ -1,15 +1,30 @@
 #ifndef __ARVORE_B__
     #define __ARVORE_B__
+    
+    #ifndef boolean
+        #define boolean
+    
+        #define bool int
+        #define true 1
+        #define false 0
+    #endif
 
     #define TAM_PAGINA 77
-    #define ORDEM_ARVORE 5
+    #define ORDEM_ARVORE 5 // nro de filhos
     #define VALOR_NULO -1
+
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+    
+    #include "util.h"
 
     typedef struct {
         char status; // '0' = inconsistente e '1' = consistente
-        int noRaiz;
+        int RRNraiz;
         int RRNproxNo;
-    }RegistroCabecalhoAB;
+        char lixo[68];
+    }NoCabecalhoAB;
 
     typedef struct {
         int chave;
@@ -20,8 +35,21 @@
         char folha; // '0' = nao e '1' = sim
         int nroChavesIndexadas;
         int RRNdoNo;
-        RegistroDadosAB registros[(ORDEM_ARVORE-1)];
+        RegistroDadosAB *registros[(ORDEM_ARVORE-1)];
         int filhos[ORDEM_ARVORE];
-    }No;
+    }NoDadosAB;
 
+    typedef struct {
+        int chave;
+        long long byteOffset;
+        int RRNfilhoDireita;
+    }ChavePromovida;
+
+    NoCabecalhoAB *carregaNoCabecalhoDaAB(FILE *arquivoIndice);
+    void escreveNoCabecalhoNaAB(FILE *arquivoIndice, NoCabecalhoAB *cabecalho);
+
+    void insereRegistroDadosNaAB(FILE *arquivoIndice, NoCabecalhoAB *cabecalho, int chaveInserida, long long byteOffset);
+    int buscaRegistroDadosNaAB(FILE *arquivoIndice, NoCabecalhoAB *cabecalho, int chaveBuscada);
+
+void imprimeArvore(FILE *arquivoIndice);
 #endif

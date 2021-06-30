@@ -4,6 +4,7 @@
     #include <stdio.h>
     #include <string.h>
     #include "registrosLinhas.h"
+    #include "arvoreB.h"
     #include "util.h"
 
     #define CREATE_INDEX_LINHAS 10

@@ -1,0 +1,223 @@
+
+
+//void insereRegistroDadosNaABsplit(FILE *arquivoIndice, /*int chaveInserida, long long byteOffset,*/
+/*                                  NoDadosAB *paginaAtual, NoDadosAB *paginaNova, ChavePromovida *chavePromovida)
+{
+    //printf("Declarando copias\n");
+    RegistroDadosAB *copiaRegistros[ORDEM_ARVORE];
+    int copiaFilhos[(ORDEM_ARVORE+1)];
+
+    //printf("Copiando 1\n");
+    copiaFilhos[0] = paginaAtual->filhos[0];
+    for (int i = 0; i < ORDEM_ARVORE - 1; i++) {
+        copiaRegistros[i] = paginaAtual->registros[i];
+        copiaFilhos[i+1] = paginaAtual->filhos[i+1];
+    }
+
+    //printf("Copiando extra\n");
+    copiaRegistros[(ORDEM_ARVORE-1)] = alocaRegistroDadosAB(VALOR_NULO);
+    copiaFilhos[ORDEM_ARVORE] = VALOR_NULO;
+
+    //printf("Encontrando idx insercao\n");
+    int indiceInsercao;
+    for (indiceInsercao = 0; indiceInsercao < ORDEM_ARVORE - 1; indiceInsercao++) {
+        if (chavePromovida->chave < copiaRegistros[indiceInsercao]->chave)
+            break;
+    }
+
+    //printf("shiftando\n");
+    for (int i = (ORDEM_ARVORE-1); i > indiceInsercao; i--) {
+        copiaRegistros[i] = copiaRegistros[i-1];
+        copiaFilhos[i+1] = copiaFilhos[i];
+    }
+
+    //printf("Atribuindo chave\n");
+    copiaRegistros[indiceInsercao]->chave = chavePromovida->chave;
+    copiaRegistros[indiceInsercao]->byteOffset = chavePromovida->byteOffset;
+    copiaFilhos[indiceInsercao+1] = chavePromovida->RRNfilhoDireita;
+
+    //printf("Preenchendo promovida\n");
+    chavePromovida->chave = copiaRegistros[(ORDEM_ARVORE/2)]->chave;
+    chavePromovida->byteOffset = copiaRegistros[(ORDEM_ARVORE/2)]->byteOffset;
+    chavePromovida->RRNfilhoDireita = paginaNova->RRNdoNo;
+
+    //printf("Copia metade 1\n");
+    paginaAtual->filhos[0] = copiaFilhos[0];
+    for (int i = 0; i < (ORDEM_ARVORE/2); i++) {
+        paginaAtual->registros[i] = copiaRegistros[i];
+        paginaAtual->filhos[i+1] = copiaFilhos[i+1];
+    }
+
+    //printf("Copia metade 2\n");
+    paginaNova->filhos[0] = copiaFilhos[(ORDEM_ARVORE/2+1)];
+    for (int i = (ORDEM_ARVORE/2+1), j = 0; i < (ORDEM_ARVORE-1); i++, j++) {
+        paginaNova->registros[j]->chave = copiaRegistros[i]->chave;
+        paginaNova->registros[j]->byteOffset = copiaRegistros[i]->byteOffset;
+        paginaNova->filhos[j+1] = copiaFilhos[i+1];
+    }
+
+    //printf("Zerando segunda metade 1\n");
+    for (int i = (ORDEM_ARVORE/2); i < (ORDEM_ARVORE-1); i++) {
+        paginaAtual->registros[i]->chave = VALOR_NULO;
+        paginaAtual->registros[i]->byteOffset = VALOR_NULO;
+        paginaAtual->filhos[i+1] = VALOR_NULO;
+    }
+
+    //printf("Atribuindo nroChavesIndexadas\n");
+    paginaAtual->nroChavesIndexadas = (ORDEM_ARVORE/2);
+    paginaNova->nroChavesIndexadas = (ORDEM_ARVORE/2);
+}
+*/
+/*
+bool insereRegistroDadosNaABrec(FILE *arquivoIndice, NoCabecalhoAB *noCabecalho, int RRNatual,
+                                int chaveInserida, long long byteOffset, ChavePromovida *chavePromovida)
+{
+    if (RRNatual == VALOR_NULO) {
+        chavePromovida->chave = chaveInserida;
+        chavePromovida->byteOffset = byteOffset;
+        chavePromovida->RRNfilhoDireita = VALOR_NULO;
+        return true;
+    }
+    else {
+
+        NoDadosAB *noAtual = carregaNoDadosDaAB(arquivoIndice, RRNatual);
+
+        int indiceInsercao;
+        for (indiceInsercao = 0; indiceInsercao < noAtual->nroChavesIndexadas; indiceInsercao++) {
+            int chaveAtual = noAtual->registros[indiceInsercao]->chave;
+            if (chaveInserida < chaveAtual)
+                break;
+        }
+
+        bool promocao = insereRegistroDadosNaABrec(arquivoIndice, noCabecalho, noAtual->filhos[indiceInsercao],
+                                                chaveInserida, byteOffset, chavePromovida);
+
+        if (!promocao)
+            return false;
+        
+        else if (noAtual->nroChavesIndexadas < (ORDEM_ARVORE - 1)) {
+            for (int i = noAtual->nroChavesIndexadas; i > indiceInsercao; i--) {
+                noAtual->registros[i] = noAtual->registros[i-1];
+                noAtual->filhos[i+1] = noAtual->filhos[i];
+            }
+            noAtual->registros[indiceInsercao]->chave = chavePromovida->chave;
+            noAtual->registros[indiceInsercao]->byteOffset = chavePromovida->byteOffset;
+            noAtual->filhos[indiceInsercao+1] = chavePromovida->RRNfilhoDireita;
+            noAtual->nroChavesIndexadas += 1;
+            escreveNoDadosNaAB(arquivoIndice, noAtual);
+            printf("Coube %d no no de rrn %d\n", chaveInserida, RRNatual);
+            return false;
+        }
+
+        else {
+            NoDadosAB *noNovo = alocaNoDadosAB();
+            noNovo->RRNdoNo = noCabecalho->RRNproxNo++;
+            noNovo->folha = noAtual->folha;
+
+            insereRegistroDadosNaABsplit(arquivoIndice, chaveInserida, byteOffset, *//*, noAtual, noNovo, chavePromovida);
+
+            escreveNoDadosNaAB(arquivoIndice, noAtual);
+            escreveNoDadosNaAB(arquivoIndice, noNovo);
+
+            printf("Fiz um split para inserir %d. Rrn atual eh %d e o novo %d.\n", chaveInserida, RRNatual, noNovo->RRNdoNo);
+
+            return true;
+        }
+    }
+}
+*/
+/*
+bool insereRegistroDadosNaABrec(FILE *arquivoIndice, NoCabecalhoAB *noCabecalho, int RRNatual,
+                                int chaveInserida, long long byteOffset, ChavePromovida *chavePromovida)
+{
+    if (RRNatual == VALOR_NULO) {
+        chavePromovida->chave = chaveInserida;
+        chavePromovida->byteOffset = byteOffset;
+        chavePromovida->RRNfilhoDireita = VALOR_NULO;
+        return true;
+    }
+    else {
+
+        NoDadosAB *noAtual = carregaNoDadosDaAB(arquivoIndice, RRNatual);
+
+        int indiceInsercao;
+        for (indiceInsercao = 0; indiceInsercao < noAtual->nroChavesIndexadas; indiceInsercao++) {
+            int chaveAtual = noAtual->registros[indiceInsercao]->chave;
+            if (chaveInserida < chaveAtual)
+                break;
+        }
+
+        bool promocao = insereRegistroDadosNaABrec(arquivoIndice, noCabecalho, noAtual->filhos[indiceInsercao],
+                                                chaveInserida, byteOffset, chavePromovida);
+
+        if (!promocao)
+            return false;
+        
+        else if (noAtual->nroChavesIndexadas < (ORDEM_ARVORE - 1)) {
+            for (int i = noAtual->nroChavesIndexadas; i > indiceInsercao; i--) {
+                noAtual->registros[i] = noAtual->registros[i-1];
+                noAtual->filhos[i+1] = noAtual->filhos[i];
+            }
+            noAtual->registros[indiceInsercao]->chave = chavePromovida->chave;
+            noAtual->registros[indiceInsercao]->byteOffset = chavePromovida->byteOffset;
+            noAtual->filhos[indiceInsercao+1] = chavePromovida->RRNfilhoDireita;
+            noAtual->nroChavesIndexadas += 1;
+            escreveNoDadosNaAB(arquivoIndice, noAtual);
+            printf("Coube %d no no de rrn %d\n", chaveInserida, RRNatual);
+            return false;
+        }
+
+        else {
+            NoDadosAB *noNovo = alocaNoDadosAB();
+            noNovo->RRNdoNo = noCabecalho->RRNproxNo++;
+            noNovo->folha = noAtual->folha;
+
+            insereRegistroDadosNaABsplit(arquivoIndice, chaveInserida, byteOffset, *//*, noAtual, noNovo, chavePromovida);
+
+            escreveNoDadosNaAB(arquivoIndice, noAtual);
+            escreveNoDadosNaAB(arquivoIndice, noNovo);
+
+            printf("Fiz um split para inserir %d. Rrn atual eh %d e o novo %d.\n", chaveInserida, RRNatual, noNovo->RRNdoNo);
+
+            return true;
+        }
+    }
+}
+*/
+
+/*void insereRegistroDadosNaAB(FILE *arquivoIndice, NoCabecalhoAB *noCabecalho, int chaveInserida, long long byteOffset) {
+
+    if (noCabecalho->RRNraiz == VALOR_NULO) {
+        NoDadosAB *primeiraRaiz = alocaNoDadosAB();
+        primeiraRaiz->nroChavesIndexadas += 1;
+        primeiraRaiz->RRNdoNo = noCabecalho->RRNproxNo++;
+        primeiraRaiz->registros[0]->chave = chaveInserida;
+        primeiraRaiz->registros[0]->byteOffset = byteOffset;
+        noCabecalho->RRNraiz = primeiraRaiz->RRNdoNo;
+        escreveNoCabecalhoNaAB(arquivoIndice, noCabecalho);
+        escreveNoDadosNaAB(arquivoIndice, primeiraRaiz);
+        printf("Inseri a primeira raiz\n");
+        return;
+    }
+
+    ChavePromovida *chavePromovida = alocaChavePromovidaAB();
+
+    bool promocao = insereRegistroDadosNaABrec(arquivoIndice, noCabecalho, noCabecalho->RRNraiz,
+                                               chaveInserida, byteOffset, chavePromovida);
+
+    if (promocao) {
+        NoDadosAB *novoNoRaiz = alocaNoDadosAB();
+        novoNoRaiz->folha = '0';
+        novoNoRaiz->nroChavesIndexadas = 1;
+        novoNoRaiz->RRNdoNo = noCabecalho->RRNproxNo++;
+        printf("A raiz foi trocada, seu novo RRN vale %d\n", novoNoRaiz->RRNdoNo);
+        novoNoRaiz->registros[0]->chave = chavePromovida->chave;
+        novoNoRaiz->registros[0]->byteOffset = chavePromovida->byteOffset;
+        novoNoRaiz->filhos[0] = noCabecalho->RRNraiz;
+        novoNoRaiz->filhos[1] = chavePromovida->RRNfilhoDireita;
+        noCabecalho->RRNraiz = novoNoRaiz->RRNdoNo;
+        escreveNoCabecalhoNaAB(arquivoIndice, noCabecalho);
+        escreveNoDadosNaAB(arquivoIndice, novoNoRaiz);
+    }
+    
+}*/

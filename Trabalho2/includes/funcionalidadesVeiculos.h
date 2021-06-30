@@ -4,6 +4,7 @@
     #include <stdio.h>
     #include <string.h>
     #include "registrosVeiculos.h"
+    #include "arvoreB.h"
     #include "util.h"
 
     #define CREATE_INDEX_VEICULOS 9
