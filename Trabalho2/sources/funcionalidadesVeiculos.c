@@ -58,7 +58,29 @@ void createIndexVeiculos(char *nomeArquivoDados, char *nomeArquivoIndice) {
 }
 
 void selectWhereVeiculos(char *nomeArquivoDados, char *nomeArquivoIndice, char *campo, char *valor) {
+    
+    FILE *arquivoDados = fopen(nomeArquivoDados, "rb");
+    FILE *arquivoIndice = fopen(nomeArquivoIndice, "rb");
 
+    // Abortando a funcionalidade se algum dos arquivos não existir:
+    if (arquivoDados == NULL || arquivoIndice == NULL) {
+        imprimeMensagemErro(stdout);
+        return;
+    }
+
+    // Carregando os cabeçalhos dos arquivos de dados e de índice para a memória:
+    CabecalhoVeiculo *cabecalhoVeiculo = carregaCabecalhoVeiculoDoBIN(arquivoDados);
+    NoCabecalhoAB *cabecalhoAB = carregaNoCabecalhoDaAB(arquivoIndice);
+
+    // Abortando a funcionalidade se algum arquivo estiver inconsistente:
+    if (cabecalhoVeiculo->status == '0' || cabecalhoAB->status == '0') {
+        imprimeMensagemErro(stdout);
+        return;
+    }
+    int byteOffSet = buscaRegistroDadosNaAB(arquivoIndice, cabecalhoAB, valor);
+    fseek(arquivoDados, byteOffSet, SEEK_SET);
+    RegistroVeiculo *veiculo = carregaRegistroVeiculoDoBIN(arquivoDados);
+    veiculoNaTela(veiculo, cabecalhoVeiculo);
 }
 
 /*

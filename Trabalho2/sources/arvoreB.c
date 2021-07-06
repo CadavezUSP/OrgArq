@@ -487,4 +487,25 @@ void insereRegistroDadosNaAB(FILE *arquivoIndice, NoCabecalhoAB *noCabecalho, in
 }
 
 
-int buscaRegistroDadosNaAB(FILE *arquivoIndice, NoCabecalhoAB *cabecalho, int chaveBuscada);
+int buscaRegistroDadosNaAB(FILE *arquivoIndice, NoCabecalhoAB *cabecalho, int chaveBuscada) {
+    NoDadosAB *buscaAtual = carregaNoDadosDaAB(arquivoIndice, cabecalho->RRNraiz);
+    return buscaRegistroDadosNaABRecursiva(arquivoIndice, chaveBuscada, buscaAtual);
+    
+}
+
+int buscaRegistroDadosNaABRecursiva(FILE *arquivoIndice, int chaveBuscada, NoDadosAB *buscaAtual) {
+    if (buscaAtual->RRNdoNo == VALOR_NULO) return -VALOR_NULO;
+    int indiceInsercao;
+    for (indiceInsercao = 0; indiceInsercao < buscaAtual->nroChavesIndexadas; indiceInsercao++) {
+        int chaveAtual =buscaAtual->registros[indiceInsercao]->chave;
+        if (chaveAtual == chaveBuscada) return buscaAtual->registros[indiceInsercao]->byteOffset;
+        else if (chaveBuscada < chaveAtual)
+            break;
+    }
+
+    // Chamando a recursão e verificando se há alguma promoção a ser feita:
+    NoDadosAB *novaBusca = carregaNoDadosDaAB(arquivoIndice, buscaAtual->filhos[indiceInsercao]);
+    int resposta = buscaRegistroDadosNaABRecursiva(arquivoIndice, chaveBuscada, novaBusca);
+    if ( resposta != VALOR_NULO) return resposta;
+    else return VALOR_NULO; 
+}

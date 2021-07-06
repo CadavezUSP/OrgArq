@@ -57,6 +57,25 @@ void createIndexLinhas(char *nomeArquivoDados, char *nomeArquivoIndice) {
 
 void selectWhereLinhas(char *nomeArquivoDados, char *nomeArquivoIndice, char *campo, int valor) {
     // campo sempre vai ser "codLinha" e valor sempre inteiro
+
+    // Abrindo os arquivos de dado e índice para e escrita:
+    FILE *arquivoDados = fopen(nomeArquivoDados, "rb");
+    FILE *arquivoIndice = fopen(nomeArquivoIndice, "rb");
+
+    // Carregando os cabeçalhos dos arquivos de dados e de índice para a memória:
+    CabecalhoLinha *cabecalhoLinha = carregaCabecalhoLinhaDoBIN(arquivoDados);
+    NoCabecalhoAB *cabecalhoAB = carregaNoCabecalhoDaAB(arquivoIndice);
+
+    // Abortando a funcionalidade se algum arquivo estiver inconsistente:
+    if (cabecalhoLinha->status == '0' || cabecalhoAB->status == '0') {
+        imprimeMensagemErro(stdout);
+        return;
+    }
+
+    int byteOffSet = buscaRegistroDadosNaAB(arquivoIndice, cabecalhoAB, valor);
+    fseek(arquivoDados, byteOffSet, SEEK_SET);
+    RegistroLinha *Linha = carregaRegistroLinhaDoBIN(arquivoDados);
+    linhaNaTela(Linha, cabecalhoLinha);
 }
 
 /*
