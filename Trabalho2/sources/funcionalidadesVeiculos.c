@@ -57,6 +57,13 @@ void createIndexVeiculos(char *nomeArquivoDados, char *nomeArquivoIndice) {
     binarioNaTela(nomeArquivoIndice);
 }
 
+/*
+Descrição: Essa função procura um registro veículo dado um campo e um valor
+@param nomeArquivoDados nome do arquivo binário de onde os registros serão lidos
+@param nomeArquivoIndice nome do arquivo de índice que será gerado
+@param campo Campo que será utilizado para a busca (no caso sempre é o prefixo)
+@param valor Valor do campo buscado
+*/
 void selectWhereVeiculos(char *nomeArquivoDados, char *nomeArquivoIndice, char *campo, char *valor) {
     
     FILE *arquivoDados = fopen(nomeArquivoDados, "rb");
@@ -77,10 +84,29 @@ void selectWhereVeiculos(char *nomeArquivoDados, char *nomeArquivoIndice, char *
         imprimeMensagemErro(stdout);
         return;
     }
-    int byteOffSet = buscaRegistroDadosNaAB(arquivoIndice, cabecalhoAB, valor);
+    //conversão do prefixo pra inteiro
+    int valorint = convertePrefixo(valor);
+    
+    //realização da busca e verificação de erro
+    int byteOffSet = buscaRegistroDadosNaAB(arquivoIndice, cabecalhoAB, valorint);
+    if (byteOffSet == VALOR_NULO) {
+        printf("Registro Inexisitente");
+        return;
+    }
+    
+    //posicionamento do cursor no byte offset, carregamento do registro e impressão do registro na tela
     fseek(arquivoDados, byteOffSet, SEEK_SET);
     RegistroVeiculo *veiculo = carregaRegistroVeiculoDoBIN(arquivoDados);
     veiculoNaTela(veiculo, cabecalhoVeiculo);
+
+    // Fechando os arquivos:
+    fclose(arquivoDados);
+    fclose(arquivoIndice);
+
+    // Liberando memória alocada:
+    free(cabecalhoVeiculo);
+    free(cabecalhoAB);
+    free(veiculo);
 }
 
 /*

@@ -6,7 +6,7 @@ FLAGS = -Wall -Werror -I
 all: compile
 
 compile:
-	@gcc -o $(EXE) $(SRC)/*.c $(FLAGS) $(INC)
+	@gcc -o $(EXE) $(SRC)/*.c $(FLAGS) $(INC) -g
 
 run:
 	@./$(EXE)

@@ -55,6 +55,13 @@ void createIndexLinhas(char *nomeArquivoDados, char *nomeArquivoIndice) {
     binarioNaTela(nomeArquivoIndice);
 }
 
+/*
+Descrição: Essa função procura um registro linah dado um campo e um valor
+@param nomeArquivoDados nome do arquivo binário de onde os registros serão lidos
+@param nomeArquivoIndice nome do arquivo de índice que será gerado
+@param campo Campo que será utilizado para a busca (no caso sempre é o codLinha)
+@param valor Valor do campo buscado
+*/
 void selectWhereLinhas(char *nomeArquivoDados, char *nomeArquivoIndice, char *campo, int valor) {
     // campo sempre vai ser "codLinha" e valor sempre inteiro
 
@@ -72,10 +79,26 @@ void selectWhereLinhas(char *nomeArquivoDados, char *nomeArquivoIndice, char *ca
         return;
     }
 
+    //realização da busca e verificação de erro
     int byteOffSet = buscaRegistroDadosNaAB(arquivoIndice, cabecalhoAB, valor);
+    if (byteOffSet == -1) {
+        printf("Registro Inexisitente");
+        return;
+    }
+
+    //posicionamento do cursor no byte offset, carregamento do registro e impressao do registro na tela
     fseek(arquivoDados, byteOffSet, SEEK_SET);
-    RegistroLinha *Linha = carregaRegistroLinhaDoBIN(arquivoDados);
-    linhaNaTela(Linha, cabecalhoLinha);
+    RegistroLinha *linha = carregaRegistroLinhaDoBIN(arquivoDados);
+    linhaNaTela(linha, cabecalhoLinha);
+
+    // Fechando os arquivos:
+    fclose(arquivoDados);
+    fclose(arquivoIndice);
+
+    // Liberando memória alocada:
+    free(cabecalhoLinha);
+    free(cabecalhoAB);
+    free(linha);
 }
 
 /*

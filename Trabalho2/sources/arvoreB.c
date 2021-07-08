@@ -487,25 +487,38 @@ void insereRegistroDadosNaAB(FILE *arquivoIndice, NoCabecalhoAB *noCabecalho, in
 }
 
 
-int buscaRegistroDadosNaAB(FILE *arquivoIndice, NoCabecalhoAB *cabecalho, int chaveBuscada) {
-    NoDadosAB *buscaAtual = carregaNoDadosDaAB(arquivoIndice, cabecalho->RRNraiz);
-    return buscaRegistroDadosNaABRecursiva(arquivoIndice, chaveBuscada, buscaAtual);
-    
-}
-
 int buscaRegistroDadosNaABRecursiva(FILE *arquivoIndice, int chaveBuscada, NoDadosAB *buscaAtual) {
-    if (buscaAtual->RRNdoNo == VALOR_NULO) return -VALOR_NULO;
+    if (buscaAtual->RRNdoNo == VALOR_NULO) return VALOR_NULO;
     int indiceInsercao;
+    int chaveAtual;
     for (indiceInsercao = 0; indiceInsercao < buscaAtual->nroChavesIndexadas; indiceInsercao++) {
-        int chaveAtual =buscaAtual->registros[indiceInsercao]->chave;
-        if (chaveAtual == chaveBuscada) return buscaAtual->registros[indiceInsercao]->byteOffset;
+        chaveAtual = buscaAtual->registros[indiceInsercao]->chave;
+        if (chaveAtual == chaveBuscada){
+            return buscaAtual->registros[indiceInsercao]->byteOffset;
+        }
         else if (chaveBuscada < chaveAtual)
             break;
     }
 
-    // Chamando a recursão e verificando se há alguma promoção a ser feita:
+    // Chamando a recursão para o nó filho
     NoDadosAB *novaBusca = carregaNoDadosDaAB(arquivoIndice, buscaAtual->filhos[indiceInsercao]);
     int resposta = buscaRegistroDadosNaABRecursiva(arquivoIndice, chaveBuscada, novaBusca);
-    if ( resposta != VALOR_NULO) return resposta;
-    else return VALOR_NULO; 
+
+    //verificando o retorno da recursão
+    if ( resposta != VALOR_NULO) {
+        liberaNoDadosAB(novaBusca);
+        return resposta;
+    }
+    else{
+        liberaNoDadosAB(novaBusca);
+        return VALOR_NULO; 
+    }
+}
+
+int buscaRegistroDadosNaAB(FILE *arquivoIndice, NoCabecalhoAB *cabecalho, int chaveBuscada) {
+    NoDadosAB *buscaAtual = carregaNoDadosDaAB(arquivoIndice, cabecalho->RRNraiz);
+    int byteOffSet = buscaRegistroDadosNaABRecursiva(arquivoIndice, chaveBuscada, buscaAtual);
+    liberaNoDadosAB(buscaAtual);
+    return byteOffSet;
+    
 }
