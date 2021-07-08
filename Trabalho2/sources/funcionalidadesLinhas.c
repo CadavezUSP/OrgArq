@@ -82,7 +82,7 @@ void selectWhereLinhas(char *nomeArquivoDados, char *nomeArquivoIndice, char *ca
     //realização da busca e verificação de erro
     int byteOffSet = buscaRegistroDadosNaAB(arquivoIndice, cabecalhoAB, valor);
     if (byteOffSet == -1) {
-        printf("Registro Inexisitente");
+        printf("Registro inexistente.");
         return;
     }
 

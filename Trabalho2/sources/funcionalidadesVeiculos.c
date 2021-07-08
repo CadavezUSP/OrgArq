@@ -90,7 +90,7 @@ void selectWhereVeiculos(char *nomeArquivoDados, char *nomeArquivoIndice, char *
     //realização da busca e verificação de erro
     int byteOffSet = buscaRegistroDadosNaAB(arquivoIndice, cabecalhoAB, valorint);
     if (byteOffSet == VALOR_NULO) {
-        printf("Registro Inexisitente");
+        printf("Registro inexistente.");
         return;
     }
     
