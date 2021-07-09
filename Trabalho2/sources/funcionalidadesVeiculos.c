@@ -66,6 +66,7 @@ Descrição: Essa função procura um registro veículo dado um campo e um valor
 */
 void selectWhereVeiculos(char *nomeArquivoDados, char *nomeArquivoIndice, char *campo, char *valor) {
     
+    // Abrindo os arquivos de dado e índice para leitura:
     FILE *arquivoDados = fopen(nomeArquivoDados, "rb");
     FILE *arquivoIndice = fopen(nomeArquivoIndice, "rb");
 
@@ -84,17 +85,18 @@ void selectWhereVeiculos(char *nomeArquivoDados, char *nomeArquivoIndice, char *
         imprimeMensagemErro(stdout);
         return;
     }
-    //conversão do prefixo pra inteiro
+
+    // Conversão do prefixo pra inteiro:
     int valorint = convertePrefixo(valor);
     
-    //realização da busca e verificação de erro
+    // Realização da busca e verificação de erro:
     int byteOffSet = buscaRegistroDadosNaAB(arquivoIndice, cabecalhoAB, valorint);
     if (byteOffSet == VALOR_NULO) {
         printf("Registro inexistente.");
         return;
     }
     
-    //posicionamento do cursor no byte offset, carregamento do registro e impressão do registro na tela
+    // Posicionamento do cursor no byte offset, carregamento do registro e impressão do registro na tela:
     fseek(arquivoDados, byteOffSet, SEEK_SET);
     RegistroVeiculo *veiculo = carregaRegistroVeiculoDoBIN(arquivoDados);
     veiculoNaTela(veiculo, cabecalhoVeiculo);

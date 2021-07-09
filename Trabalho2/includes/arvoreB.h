@@ -51,8 +51,6 @@
     NoCabecalhoAB *carregaNoCabecalhoDaAB(FILE *arquivoIndice);
     void escreveNoCabecalhoNaAB(FILE *arquivoIndice, NoCabecalhoAB *cabecalho);
     void insereRegistroDadosNaAB(FILE *arquivoIndice, NoCabecalhoAB *cabecalho, int chaveInserida, long long byteOffset);
-    int buscaRegistroDadosNaAB(FILE *arquivoIndice, NoCabecalhoAB *cabecalho, int chaveBuscada);
+    long long buscaRegistroDadosNaAB(FILE *arquivoIndice, NoCabecalhoAB *cabecalho, int chaveBuscada);
 
-    // Função para debugar, vamos retirá-la
-    void imprimeArvore(FILE *arquivoIndice);
 #endif

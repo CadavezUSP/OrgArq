@@ -224,47 +224,6 @@ void escreveNoDadosNaAB(FILE *arquivoIndice, NoDadosAB *noDados) {
     }
 }
 
-
-
-
-
-// ======================== Início de funções de impressão para debugar ========================
-
-void imprimeNoCabecalho(NoCabecalhoAB *noCabecalho) {
-    printf("Status: %c\n", noCabecalho->status);
-    printf("NoRaiz: %d\n", noCabecalho->RRNraiz);
-    printf("Rrn prox no: %d\n", noCabecalho->RRNproxNo);
-    printf("Lixo: ");
-    for (int i = 0; i < 68; i ++)
-        printf("%c", noCabecalho->lixo[i]);
-}
-
-void imprimeNo(NoDadosAB *noDados) {
-    printf("RRN: %d | Folha: %c | NroChaves: %d | %d ", noDados->RRNdoNo, noDados->folha, noDados->nroChavesIndexadas, noDados->filhos[0]);
-    for (int i = 0; i < ORDEM_ARVORE - 1; i++) {
-        printf("[%d] %d ", noDados->registros[i]->chave, noDados->filhos[i+1]);
-    }
-}
-
-void imprimeArvore(FILE *arquivoIndice) {
-    NoCabecalhoAB *cabecalho = carregaNoCabecalhoDaAB(arquivoIndice);
-    imprimeNoCabecalho(cabecalho);
-    printf("\n");
-    int rrnAtual = 0;
-    while (!fimDoArquivoBIN(arquivoIndice)) {
-        NoDadosAB *dados = carregaNoDadosDaAB(arquivoIndice, rrnAtual++);
-        imprimeNo(dados);
-        printf("\n");
-    }
-    printf("\n");
-}
-
-// ============================= Fim das funções para debugar =============================
-
-
-
-
-
 /*
 Descrição: Insere um registro no arquivo de índice e rearranja as chaves de um nó cheio, 
 movendo a metade maior para um nó com espaço. Por fim, sobrescreve o valor do parâmetro 
@@ -312,7 +271,7 @@ void split(FILE *arquivoIndice, NoDadosAB *noCheio, NoDadosAB *noComEspaco, Regi
 
     /*  OBS: Nas linhas que precedem esse comentário registroPromovido guarda os dados do registro a ser 
         inserido no arquivo de índice. Uma vez inserido, ele passará a guardar os dados do registro que foi 
-        promovido ao nível superior da árvore, para que ele possa ser acessado na função de inserção recuriva. */
+        promovido ao nível superior da árvore, para que ele possa ser acessado na função de inserção recursiva. */
 
     // Atribuindo os valores para o registro que deve ser promovido (o que está na posição central das cópias):
     registroPromovido->chave = copiaRegistros[(ORDEM_ARVORE/2)]->chave;
@@ -486,13 +445,21 @@ void insereRegistroDadosNaAB(FILE *arquivoIndice, NoCabecalhoAB *noCabecalho, in
     free(registroPromovido);
 }
 
-
+/*
+Descrição: função recursiva para busca de um registro em um arquivo de índice Árvore B
+@param arquivoIndice: nome do arquivo de índice em que a busca será realizada
+@param chaveBuscada: identificador único do registro buscado
+@param buscaAtual: nó atual em que a busca será feita (começa pela raíz) 
+@return O byte offset do registro buscado ou VALOR_NULO (-1) caso o registro não seja encontrado
+*/
 int buscaRegistroDadosNaABRecursiva(FILE *arquivoIndice, int chaveBuscada, NoDadosAB *buscaAtual) {
+
+    // Caso base da recursão: não existem mais filhos para checar
     if (buscaAtual->RRNdoNo == VALOR_NULO) return VALOR_NULO;
-    int indiceInsercao;
-    int chaveAtual;
+
+    int indiceInsercao; // índice em que a chave buscada seria inserida
     for (indiceInsercao = 0; indiceInsercao < buscaAtual->nroChavesIndexadas; indiceInsercao++) {
-        chaveAtual = buscaAtual->registros[indiceInsercao]->chave;
+        int chaveAtual = buscaAtual->registros[indiceInsercao]->chave;
         if (chaveAtual == chaveBuscada){
             return buscaAtual->registros[indiceInsercao]->byteOffset;
         }
@@ -500,25 +467,24 @@ int buscaRegistroDadosNaABRecursiva(FILE *arquivoIndice, int chaveBuscada, NoDad
             break;
     }
 
-    // Chamando a recursão para o nó filho
+    // Chamando a recursão para o nó filho:
     NoDadosAB *novaBusca = carregaNoDadosDaAB(arquivoIndice, buscaAtual->filhos[indiceInsercao]);
     int resposta = buscaRegistroDadosNaABRecursiva(arquivoIndice, chaveBuscada, novaBusca);
 
-    //verificando o retorno da recursão
-    if ( resposta != VALOR_NULO) {
-        liberaNoDadosAB(novaBusca);
-        return resposta;
-    }
-    else{
-        liberaNoDadosAB(novaBusca);
-        return VALOR_NULO; 
-    }
+    // Liberando memória alocada e retornando a resposta:
+    liberaNoDadosAB(novaBusca);
+    return resposta;
 }
 
-int buscaRegistroDadosNaAB(FILE *arquivoIndice, NoCabecalhoAB *cabecalho, int chaveBuscada) {
+/* Descrição: busca a posição um registro de dados em um arquivo de índice do tipo Árvore B
+@param arquivoIndice: nome do arquivo de índice em que a busca será realizada
+@param cabecalho: nó de cabeçalho correspondente ao arquivo de índice
+@param chaveBuscada: identificador único do registro buscado
+@return O byte offset do registro buscado ou VALOR_NULO (-1) caso o registro não seja encontrado
+*/
+long long buscaRegistroDadosNaAB(FILE *arquivoIndice, NoCabecalhoAB *cabecalho, int chaveBuscada) {
     NoDadosAB *buscaAtual = carregaNoDadosDaAB(arquivoIndice, cabecalho->RRNraiz);
     int byteOffSet = buscaRegistroDadosNaABRecursiva(arquivoIndice, chaveBuscada, buscaAtual);
     liberaNoDadosAB(buscaAtual);
     return byteOffSet;
-    
 }
