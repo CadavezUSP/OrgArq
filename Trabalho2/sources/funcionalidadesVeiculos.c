@@ -154,15 +154,15 @@ void insertIntoVeiculos(char *nomeArquivoDados, char *nomeArquivoIndice, int num
         long long byteOffsetAtual = ftell(arquivoDados);
         RegistroVeiculo *registroAtual = carregaRegistroVeiculoDaStdin();
         escreveRegistroVeiculoNoBIN(registroAtual, arquivoDados);
-        cabecalhoVeiculo->nroRegistros += 1;
         int prefixoInteiro = convertePrefixo(registroAtual->prefixo);
         insereRegistroDadosNaAB(arquivoIndice, cabecalhoAB, prefixoInteiro, byteOffsetAtual);
+        cabecalhoVeiculo->nroRegistros += 1;
+        cabecalhoVeiculo->byteProxReg = ftell(arquivoDados);
         free(registroAtual);
     }
     
     // Atualizando o cabeçalho do arquivo de dados:
     cabecalhoVeiculo->status = '1';
-    cabecalhoVeiculo->byteProxReg = ftell(arquivoDados);
     escreveCabecalhoVeiculoNoBIN(cabecalhoVeiculo, arquivoDados);
 
     // Atualizando o cabeçalho do arquivo de índice:

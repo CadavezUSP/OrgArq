@@ -143,14 +143,14 @@ void insertIntoLinhas(char *nomeArquivoDados, char *nomeArquivoIndice, int numer
         long long byteOffsetAtual = ftell(arquivoDados);
         RegistroLinha *registroAtual = carregaRegistroLinhaDaStdin();
         escreveRegistroLinhaNoBIN(registroAtual, arquivoDados);
-        cabecalhoLinha->nroRegistros += 1;
         insereRegistroDadosNaAB(arquivoIndice, cabecalhoAB, registroAtual->codLinha, byteOffsetAtual);
+        cabecalhoLinha->nroRegistros += 1;
+        cabecalhoLinha->byteProxReg = ftell(arquivoDados);
         free(registroAtual);
     }
     
     // Atualizando o cabeçalho do arquivo de dados:
     cabecalhoLinha->status = '1';
-    cabecalhoLinha->byteProxReg = ftell(arquivoDados);
     escreveCabecalhoLinhaNoBIN(cabecalhoLinha, arquivoDados);
 
     // Atualizando o cabeçalho do arquivo de índice:
