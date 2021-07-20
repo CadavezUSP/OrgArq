@@ -2,11 +2,94 @@
 
 
 void juncaoLoopUnico(char *nomeArqVeic, char *nomeArqLinhas, char *campoVeiculo, char *campoLinha) {
+    // FILE *arqVeic = fopen(nomeArqVeic, "r");
+    // FILE *arqLinhas = fopen(nomeArqLinhas, "r");
 
+    // // Abortando a funcionalidade se algum dos parâmetros for inválido:
+    // if (arqVeic == NULL || arqLinhas == NULL) {
+    //     imprimeMensagemErro(stdout);
+    //     return;
+    // }
+
+    // CabecalhoVeiculo *cabVeiculo = carregaCabecalhoVeiculoDoBIN(arqVeic);
+    // CabecalhoLinha *cabLinha = carregaCabecalhoLinhaDoBIN(arqLinhas);
+    // int tevePrint =false;
+
+    // while (!fimDoArquivoBIN(arqVeic))
+    // {
+    //     RegistroVeiculo *regVeiculo = carregaRegistroVeiculoDoBIN(arqVeic);
+    //     if (regVeiculo->removido == '0'){
+    //         free(regVeiculo);
+    //         continue;
+    //     }
+    //     while (!fimDoArquivoBIN(arqLinhas))
+    //     {
+    //         RegistroLinha *regLinha = carregaRegistroLinhaDoBIN(arqLinhas);
+    //         if (compararRegistros(regLinha, regVeiculo)){
+    //             tevePrint =true;
+    //             veiculoNaTela(regVeiculo, cabVeiculo);
+    //             printf("\n");
+    //             linhaNaTela(regLinha, cabLinha);
+    //             printf("\n");
+    //         }
+    //         free(regLinha);
+    //     }
+    //     fseek(arqLinhas, 0, SEEK_SET);
+    //     free (regVeiculo);
+    // }
+    
+    // if (!tevePrint){
+    //     printf("Registro inexistente");
+    // }
+    // free(cabLinha);
+    // free(cabVeiculo);
+    // fclose(arqVeic);
+    // fclose(arqLinhas);
 }
 
 void juncaoArquivoIndice(char *nomeArqVeic, char *nomeArqLinhas, char *campoVeiculo, char *campoLinha, char *nomeArqIndice) {
+    FILE *arqVeic = fopen(nomeArqVeic, "r");
+    FILE *arqLinhas = fopen(nomeArqLinhas, "r");
+    FILE *arqIndice = fopen(nomeArqIndice, "r");
 
+    // Abortando a funcionalidade se algum dos parâmetros for inválido:
+    if (arqVeic == NULL || arqLinhas == NULL) {
+        imprimeMensagemErro(stdout);
+        return;
+    }
+
+    CabecalhoVeiculo *cabVeiculo = carregaCabecalhoVeiculoDoBIN(arqVeic);
+    CabecalhoLinha *cabLinha = carregaCabecalhoLinhaDoBIN(arqLinhas);
+    NoCabecalhoAB *noCabAB= carregaNoCabecalhoDaAB(arqIndice);
+    
+    int tevePrint =false;
+
+    while (!fimDoArquivoBIN(arqVeic)) {
+        RegistroVeiculo *regVeiculo = carregaRegistroVeiculoDoBIN(arqVeic);
+        if (regVeiculo->removido == '0'){
+            free(regVeiculo);
+            continue;
+        }
+        long long offset = buscaRegistroDadosNaAB(arqIndice, noCabAB, regVeiculo->codLinha);
+        if (offset != VALOR_NULO){
+            tevePrint = 1;
+            fseek(arqLinhas, offset, SEEK_SET);
+            RegistroLinha *regLinha = carregaRegistroLinhaDoBIN(arqLinhas);
+            veiculoNaTela(regVeiculo, cabVeiculo);
+            linhaNaTela(regLinha, cabLinha);
+            free(regLinha);
+        }
+        fseek(arqIndice, 0, SEEK_SET);
+        free(regVeiculo);
+    }
+    if (!tevePrint){
+        printf("Registro inexistente");
+    }
+    free(cabLinha);
+    free(cabVeiculo);
+    fclose(arqVeic);
+    fclose(arqLinhas);
+    fclose(arqIndice);
 }
 
 /*

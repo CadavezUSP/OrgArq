@@ -3,6 +3,7 @@
 
 #include "util.h"
 
+
 int comparVeiculos(const void *a, const void *b) {
     return (*(RegistroVeiculo **) a)->codLinha - (*(RegistroVeiculo **) b)->codLinha;
 }
@@ -10,6 +11,11 @@ int comparVeiculos(const void *a, const void *b) {
 int comparLinhas(const void *a, const void *b) {
     return (*(RegistroLinha **) a)->codLinha - (*(RegistroLinha **) b)->codLinha;
 }
+
+// int compararRegistros(RegistroLinha *linha, RegistroVeiculo *veiculo){
+//     return linha->codLinha == veiculo->codLinha;
+
+// }
 
 /*
 Descrição: obtém o mês do ano correspondente a partir de seu número
