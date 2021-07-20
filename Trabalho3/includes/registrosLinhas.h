@@ -34,8 +34,10 @@
     }RegistroLinha;
 
     CabecalhoLinha *carregaCabecalhoLinhaDoBIN(FILE *arquivoBIN); 
+    CabecalhoLinha *inicializaCabecalhoLinha(void);
     RegistroLinha *carregaRegistroLinhaDoBIN(FILE *arquivoBIN); 
-    RegistroLinha *carregaRegistroLinhaDaStdin(void);
+    RegistroLinha **carregaVetorRegistrosLinhaOrdenadoDoBIN(FILE *arquivoBIN);
+    void copiaDescricoesCabecalhoLinha(CabecalhoLinha *cabecalhoOriginal, CabecalhoLinha *cabecalhoCopia);
     void escreveCabecalhoLinhaNoBIN(CabecalhoLinha *cabecalho, FILE *arquivoBIN);
     void escreveRegistroLinhaNoBIN(RegistroLinha *registroLinha, FILE *arquivoBIN); 
     void linhaNaTela (RegistroLinha *Reg, CabecalhoLinha *cabecalho);

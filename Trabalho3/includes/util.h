@@ -9,11 +9,14 @@
     #include <string.h>
     #include <ctype.h>
 
+    #include "registrosVeiculos.h"
+    #include "registrosLinhas.h"
+
     char* verMes(int num);
     void imprimeMensagemErro(FILE *stream);
     int fimDoArquivoBIN(FILE *arquivoBIN);
     void binarioNaTela(char *nomeArquivoBinario); 
-    void scan_quote_string(char *str);
-    int convertePrefixo(char* str);
+    int comparVeiculos(const void *a, const void *b);
+    int comparLinhas(const void *a, const void *b);
 
 #endif

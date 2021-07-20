@@ -4,6 +4,42 @@
 #include "registrosLinhas.h"
 
 /*
+Descrição: aloca memória e inicializa uma estrutura do tipo CabecalhoLinha, preenchendo-a com valores nulos
+@return um pontero para a região de memória em que a estrutura foi alocada
+*/
+CabecalhoLinha *inicializaCabecalhoLinha(void) {
+
+    // Alocando memória para uma estrutura CabecalhoLinha:
+    CabecalhoLinha *cabecalhoNovo = malloc(sizeof(CabecalhoLinha));
+
+    // Zerando os campos inteiros e caractere:
+    cabecalhoNovo->status = '0';
+    cabecalhoNovo->byteProxReg = 0;
+    cabecalhoNovo->nroRegistros = 0;
+    cabecalhoNovo->nroRegRemovidos = 0;
+
+    // Zerando as descrições:
+    memset(cabecalhoNovo->descreveCodigo, 0, 16);
+    memset(cabecalhoNovo->descreveCartao, 0, 14);
+    memset(cabecalhoNovo->descreveNome, 0, 14);
+    memset(cabecalhoNovo->descreveCor, 0, 25);
+
+    return cabecalhoNovo;
+}
+
+/*
+Descrição: Copia os campos de descrições de uma estrutura de cabeçalho para outra
+@param cabecalhoOriginal: ponteiro para registro de cabeçalho de origem das descrições
+@param cabecalhoCopia: ponteiro para registro de cabeçalho de destino das descrições
+*/
+void copiaDescricoesCabecalhoLinha(CabecalhoLinha *cabecalhoOriginal, CabecalhoLinha *cabecalhoCopia) {
+    strcpy(cabecalhoCopia->descreveCodigo, cabecalhoOriginal->descreveCodigo);
+    strcpy(cabecalhoCopia->descreveCartao, cabecalhoOriginal->descreveCartao);
+    strcpy(cabecalhoCopia->descreveNome, cabecalhoOriginal->descreveNome);
+    strcpy(cabecalhoCopia->descreveCor, cabecalhoOriginal->descreveCor);
+}
+
+/*
 Descrição: Escreve os dados de uma estrutura do tipo CabecalhoLinha* em um arquivo binário
 @param cabecalho: ponteiro para a região de memória onde o registro de cabeçalho está armazenado 
 @param arquivoBIN: fluxo do arquivo binário em que os dados serão escritos
@@ -99,39 +135,34 @@ RegistroLinha *carregaRegistroLinhaDoBIN(FILE *arquivoBIN) {
 }
 
 /*
-Descrição: Aloca memória e preenche dados uma estrutura do tipo RegistroLinha a partir da entrada padrão
-@return RegistroLinha* ponteiro para a região de memória em que os dados foram armazenados 
+Descrição: Aloca memória e preenche um vetor ordenado de estruturas do tipo RegistroLinha lidas de um arquivo binário 
+@param arquivoBIN: fluxo do arquivo binário de onde as informações do registro de dados serão extraídas
+@return RegistroLinha** ponteiro para a região de memória em que o vetor foi armazenado
 */
-RegistroLinha *carregaRegistroLinhaDaStdin() {
+RegistroLinha **carregaVetorRegistrosLinhaOrdenadoDoBIN(FILE *arquivoBIN) {
 
-    // Alocando memória para uma estrutura do tipo RegistroLinha:
-    RegistroLinha *registroLinha = malloc(sizeof(RegistroLinha));
+    // Inicializando um vetor para os registros que serão carregados na memória:
+    RegistroLinha **registrosLinha = NULL;
+    int nroRegistros = 0;
 
-    char buffer[10];
+    // Carregando todos os registros não removidos do arquivo desordenado para o vetor de registros:
+    while (!fimDoArquivoBIN(arquivoBIN)) {
+        registrosLinha = realloc(registrosLinha, (nroRegistros + 1) * sizeof(RegistroLinha *));
+        RegistroLinha *registroAtual = carregaRegistroLinhaDoBIN(arquivoBIN);
+        if (registroAtual->removido == '1')
+            registrosLinha[nroRegistros++] = registroAtual;
+        else
+            free(registroAtual);
+    }
 
-    // Marcando o campo quantidade de lugares:
-    scan_quote_string(buffer);
-    registroLinha->codLinha = atoi(buffer);
+    // Ordenando o vetor de registros não removidos com a função qsort:
+    qsort(registrosLinha, nroRegistros, sizeof(RegistroLinha *), comparLinhas);
 
-    // Marcando o campo aceita cartão: 
-    scan_quote_string(buffer);
-    registroLinha->aceitaCartao = strcmp(buffer, "") != 0 ? buffer[0] : '\0';
+    // Adicionando o terminador de vetor, nessa implementação definido como nulo:
+    registrosLinha = realloc(registrosLinha, (nroRegistros + 1) * sizeof(RegistroLinha *));
+    registrosLinha[nroRegistros] = NULL;
 
-    // Marcando o campo nome linha:
-    scan_quote_string(registroLinha->nomeLinha);
-    registroLinha->nomeLinha[0] = strcmp(registroLinha->nomeLinha, "") != 0 ? registroLinha->nomeLinha[0] : '\0'; 
-
-    // Marcando o campo categoria:
-    scan_quote_string(registroLinha->corLinha);
-    registroLinha->corLinha[0] = strcmp(registroLinha->corLinha, "") != 0 ? registroLinha->corLinha[0] : '\0'; 
-
-    // Marcando os demais campos:
-    registroLinha->removido = '1';
-    registroLinha->tamanhoNome = strlen(registroLinha->nomeLinha);
-    registroLinha->tamanhoCor = strlen(registroLinha->corLinha);
-    registroLinha->tamanhoRegistro = 13 + registroLinha->tamanhoNome + registroLinha->tamanhoCor;
-
-    return registroLinha;
+    return registrosLinha;
 }
 
 /*

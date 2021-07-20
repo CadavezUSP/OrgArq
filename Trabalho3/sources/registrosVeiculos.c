@@ -4,6 +4,46 @@
 #include "registrosVeiculos.h"
 
 /*
+Descrição: aloca memória e inicializa uma estrutura do tipo CabecalhoVeiculo, preenchendo-a com valores nulos
+@return um pontero para a região de memória em que a estrutura foi alocada
+*/
+CabecalhoVeiculo *inicializaCabecalhoVeiculo(void) {
+
+    // Alocando memória para uma estrutura CabecalhoVeiculo:
+    CabecalhoVeiculo *cabecalhoNovo = malloc(sizeof(CabecalhoVeiculo));
+
+    // Zerando os campos inteiros e caractere:
+    cabecalhoNovo->status = '0';
+    cabecalhoNovo->byteProxReg = 0;
+    cabecalhoNovo->nroRegistros = 0;
+    cabecalhoNovo->nroRegRemovidos = 0;
+
+    // Zerando as descrições:
+    memset(cabecalhoNovo->descrevePrefixo, 0, 19);
+    memset(cabecalhoNovo->descreveData, 0, 36);
+    memset(cabecalhoNovo->descreveLugares, 0, 43);
+    memset(cabecalhoNovo->descreveLinha, 0, 27);
+    memset(cabecalhoNovo->descreveModelo, 0, 18);
+    memset(cabecalhoNovo->descreveCategoria, 0, 21);
+
+    return cabecalhoNovo;
+}
+
+/*
+Descrição: Copia os campos de descrições de uma estrutura de cabeçalho para outra
+@param cabecalhoOriginal: ponteiro para registro de cabeçalho de origem das descrições
+@param cabecalhoCopia: ponteiro para registro de cabeçalho de destino das descrições
+*/
+void copiaDescricoesCabecalhoVeiculo(CabecalhoVeiculo *cabecalhoOriginal, CabecalhoVeiculo *cabecalhoCopia) {
+    strcpy(cabecalhoCopia->descrevePrefixo, cabecalhoOriginal->descrevePrefixo);
+    strcpy(cabecalhoCopia->descreveData, cabecalhoOriginal->descreveData);
+    strcpy(cabecalhoCopia->descreveLugares, cabecalhoOriginal->descreveLugares);
+    strcpy(cabecalhoCopia->descreveLinha, cabecalhoOriginal->descreveLinha);
+    strcpy(cabecalhoCopia->descreveModelo, cabecalhoOriginal->descreveModelo);
+    strcpy(cabecalhoCopia->descreveCategoria, cabecalhoOriginal->descreveCategoria);
+}
+
+/*
 Descrição: Escreve os dados de uma estrutura do tipo CabecalhoVeiculo* em um arquivo binário
 @param cabecalho: ponteiro para a região de memória onde o registro de cabeçalho está armazenado 
 @param arquivoBIN: fluxo do arquivo binário em que os dados serão escritos
@@ -113,50 +153,34 @@ RegistroVeiculo *carregaRegistroVeiculoDoBIN(FILE *arquivoBIN) {
 }
 
 /*
-Descrição: Aloca memória e preenche dados uma estrutura do tipo RegistroVeiculo a partir da entrada padrão
-@return RegistroVeiculo* ponteiro para a região de memória em que os dados foram armazenados 
+Descrição: Aloca memória e preenche um vetor ordenado de estruturas do tipo RegistroVeiculo lidas de um arquivo binário 
+@param arquivoBIN: fluxo do arquivo binário de onde as informações do registro de dados serão extraídas
+@return RegistroVeiculo** ponteiro para a região de memória em que o vetor foi armazenado
 */
-RegistroVeiculo *carregaRegistroVeiculoDaStdin() {
+RegistroVeiculo **carregaVetorRegistrosVeiculoOrdenadoDoBIN(FILE *arquivoBIN) {
 
-    // Alocando memória para uma estrutura do tipo RegistroVeiculo:
-    RegistroVeiculo *registroVeiculo = malloc(sizeof(RegistroVeiculo));
+    // Inicializando um vetor para os registros que serão carregados na memória:
+    RegistroVeiculo **registrosVeiculo = NULL;
+    int nroRegistros = 0;
 
-    // Marcando o campo prefixo:
-    scan_quote_string(registroVeiculo->prefixo);
-
-    // Marcando campo data:
-    scan_quote_string(registroVeiculo->data);
-    if (strcmp(registroVeiculo->data, "") == 0) {
-        for (int i = 1; i < 10; i++)
-            registroVeiculo->data[i] = '@';
-        registroVeiculo->data[0] = '\0';
+    // Carregando todos os registros não removidos do arquivo desordenado para o vetor de registros:
+    while (!fimDoArquivoBIN(arquivoBIN)) {
+        registrosVeiculo = realloc(registrosVeiculo, (nroRegistros + 1) * sizeof(RegistroVeiculo *));
+        RegistroVeiculo *registroAtual = carregaRegistroVeiculoDoBIN(arquivoBIN);
+        if (registroAtual->removido == '1') // se o registro não for removido
+            registrosVeiculo[nroRegistros++] = registroAtual;
+        else
+            free(registroAtual);
     }
 
-    char inteiroAscii[10];
+    // Ordenando o vetor de registros não removidos com a função qsort:
+    qsort(registrosVeiculo, nroRegistros, sizeof(RegistroVeiculo *), comparVeiculos);
 
-    // Marcando o campo quantidade de lugares:
-    scan_quote_string(inteiroAscii);
-    registroVeiculo->quantidadeLugares = strcmp(inteiroAscii, "") != 0 ? atoi(inteiroAscii) : -1;
+    // Adicionando o terminador de vetor, nessa implementação definido como nulo:
+    registrosVeiculo = realloc(registrosVeiculo, (nroRegistros + 1) * sizeof(RegistroVeiculo *));
+    registrosVeiculo[nroRegistros] = NULL;
 
-    // Marcando o campo código da linha:
-    scan_quote_string(inteiroAscii);
-    registroVeiculo->codLinha = strcmp(inteiroAscii, "") != 0 ? atoi(inteiroAscii) : -1;
-
-    // Marcando o campo modelo:
-    scan_quote_string(registroVeiculo->modelo);
-    registroVeiculo->modelo[0] = strcmp(registroVeiculo->modelo, "") != 0 ? registroVeiculo->modelo[0] : '\0'; 
-
-    // Marcando o campo categoria:
-    scan_quote_string(registroVeiculo->categoria);
-    registroVeiculo->categoria[0] = strcmp(registroVeiculo->categoria, "") != 0 ? registroVeiculo->categoria[0] : '\0'; 
-
-    // Marcando os demais campos:
-    registroVeiculo->removido = '1';
-    registroVeiculo->tamanhoCategoria = strlen(registroVeiculo->categoria);
-    registroVeiculo->tamanhoModelo = strlen(registroVeiculo->modelo);
-    registroVeiculo->tamanhoRegistro = 31 + registroVeiculo->tamanhoModelo + registroVeiculo->tamanhoCategoria;
-
-    return registroVeiculo;
+    return registrosVeiculo;
 }
 
 /*
@@ -197,6 +221,4 @@ void veiculoNaTela(RegistroVeiculo *Reg, CabecalhoVeiculo *cabecalho) {
     if (Reg->quantidadeLugares != -1)
         printf ("%d\n", Reg->quantidadeLugares);
     else printf("campo com valor nulo\n");
-
-    printf("\n");
 }

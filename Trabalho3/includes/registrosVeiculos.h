@@ -38,8 +38,10 @@
     }RegistroVeiculo;
 
     CabecalhoVeiculo *carregaCabecalhoVeiculoDoBIN(FILE *arquivoBIN); 
+    CabecalhoVeiculo *inicializaCabecalhoVeiculo(void);
     RegistroVeiculo *carregaRegistroVeiculoDoBIN(FILE *arquivoBIN); 
-    RegistroVeiculo *carregaRegistroVeiculoDaStdin(void);
+    RegistroVeiculo **carregaVetorRegistrosVeiculoOrdenadoDoBIN(FILE *arquivoBIN);
+    void copiaDescricoesCabecalhoVeiculo(CabecalhoVeiculo *cabecalhoOriginal, CabecalhoVeiculo *cabecalhoCopia);
     void escreveCabecalhoVeiculoNoBIN(CabecalhoVeiculo *cabecalho, FILE *arquivoBIN);
     void escreveRegistroVeiculoNoBIN(RegistroVeiculo *registroVeiculo, FILE *arquivoBIN); 
     void veiculoNaTela (RegistroVeiculo *Reg, CabecalhoVeiculo *cabecalho);

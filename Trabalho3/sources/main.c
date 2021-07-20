@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
         char campoVeiculo[100];
         char campoLinha[100];
         scanf("%s %s %s %s", nomeArqVeic, nomeArqLinhas, campoVeiculo, campoLinha);
-        juncaoLoopUnico(nomeArqVeic, nomeArqVeic, campoVeiculo, campoLinha);
+        juncaoLoopUnico(nomeArqVeic, nomeArqLinhas, campoVeiculo, campoLinha);
     }
     else if (funcionalidade == JUNCAO_ARQUIVO_INDICE) {
         char nomeArqVeic[100];
@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
         char nomeArqOrdenado[100];
         char campoOrdenacao[100];
         scanf("%s %s %s", nomeArqDesordenado, nomeArqOrdenado, campoOrdenacao);
-        ordenacaoVeiculos(nomeArqDesordenado, nomeArqDesordenado, campoOrdenacao);
+        ordenacaoVeiculos(nomeArqDesordenado, nomeArqOrdenado, campoOrdenacao);
     }
     else if (funcionalidade == ORDENACAO_LINHAS) {
         char nomeArqDesordenado[100];
@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
         char campoVeiculo[100];
         char campoLinha[100];
         scanf("%s %s %s %s", nomeArqVeic, nomeArqLinhas, campoVeiculo, campoLinha);
-        juncaoOrdenada(nomeArqVeic, nomeArqVeic, campoVeiculo, campoLinha);
+        juncaoOrdenada(nomeArqVeic, nomeArqLinhas, campoVeiculo, campoLinha);
     } 
     else
         imprimeMensagemErro(stdout);
