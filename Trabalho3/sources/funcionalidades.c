@@ -1,6 +1,12 @@
 #include "funcionalidades.h"
 
-
+/*
+Descrição: Realiza a junção de um arquivo binario veiculos e um arquivo binario de dados linha atraves de um loop aninhado
+@param nomeArqVeic: nome do arquivo binário com os veículos
+@param nomeArqLinhas: nome do arquivo binário com as linhas
+@param campoVeiculo: campo que servirá para comparar veículos com as linhas (sempre codLinha nesse caso)
+@param campoLinha: campo que servirá para comparar linhas com os veiculos (sempre codLinha nesse caso)
+*/
 void juncaoLoopUnico(char *nomeArqVeic, char *nomeArqLinhas, char *campoVeiculo, char *campoLinha) {
     FILE *arqVeic = fopen(nomeArqVeic, "r");
     FILE *arqLinhas = fopen(nomeArqLinhas, "r");
@@ -11,51 +17,84 @@ void juncaoLoopUnico(char *nomeArqVeic, char *nomeArqLinhas, char *campoVeiculo,
         return;
     }
 
+    //carregamento dos cabeçalhos para a memória principal
     CabecalhoVeiculo *cabVeiculo = carregaCabecalhoVeiculoDoBIN(arqVeic);
     CabecalhoLinha *cabLinha = carregaCabecalhoLinhaDoBIN(arqLinhas);
+
+    //checagem dos status do cabecalho
     if (cabLinha->status == '0' ||cabVeiculo->status == '0'){
         imprimeMensagemErro(stdout);
+        free(cabLinha);
+        free(cabVeiculo);
+        fclose(arqVeic);
+        fclose(arqLinhas);
         return;
     }
     int primeiroRegistro = ftell(arqLinhas);
     int tevePrint =false;
 
+    //loop para percorrer arquivo de veiculos até o fim
     while (!fimDoArquivoBIN(arqVeic))
     {
         RegistroVeiculo *regVeiculo = carregaRegistroVeiculoDoBIN(arqVeic);
+
+        //verificando se o veiculo está logicamente removida
         if (regVeiculo->removido == '0'){
             free(regVeiculo);
             continue;
         }
+        
         while (!fimDoArquivoBIN(arqLinhas))
         {
             RegistroLinha *regLinha = carregaRegistroLinhaDoBIN(arqLinhas);
+            
+            //verificando se a linha está logicamente removida
             if (regLinha->removido == '0'){
                 free(regLinha);
                 continue;
             }
+
+            //se os campos codLinha forem iguais realizar impressao
             if (regVeiculo->codLinha == regLinha->codLinha){
                 tevePrint =true;
                 veiculoNaTela(regVeiculo, cabVeiculo);
                 linhaNaTela(regLinha, cabLinha);
+                free(regLinha);
                 break;
             }
             free(regLinha);
         }
+
+        //voltando o ponteiro da linha para o primeiro registro
         fseek(arqLinhas, primeiroRegistro, SEEK_SET);
         free (regVeiculo);
     }
     
+    //verificando se algo foi impresso
     if (!tevePrint){
         printf("Registro inexistente.");
     }
+
+    //liberação da memoria
     free(cabLinha);
     free(cabVeiculo);
+
+    //Fechando os arquivos
     fclose(arqVeic);
     fclose(arqLinhas);
 }
 
+/*
+Descrição: Realiza a junção de um arquivo binario veiculos e um arquivo binario de dados linha atraves de um loop único
+@param nomeArqVeic: nome do arquivo binário com os veículos
+@param nomeArqLinhas: nome do arquivo binário com as linhas
+@param campoVeiculo: campo que servirá para comparar veículos com as linhas (sempre codLinha nesse caso)
+@param campoLinha: campo que servirá para comparar linhas com os veiculos (sempre codLinha nesse caso)
+@param nomeArqIndice: nome do arquivo de indices das linhas
+*/
 void juncaoArquivoIndice(char *nomeArqVeic, char *nomeArqLinhas, char *campoVeiculo, char *campoLinha, char *nomeArqIndice) {
+
+    //abrindo os arquivos
     FILE *arqVeic = fopen(nomeArqVeic, "r");
     FILE *arqLinhas = fopen(nomeArqLinhas, "r");
     FILE *arqIndice = fopen(nomeArqIndice, "r");
@@ -66,23 +105,38 @@ void juncaoArquivoIndice(char *nomeArqVeic, char *nomeArqLinhas, char *campoVeic
         return;
     }
 
+    //Lendo os cabecalhos
     CabecalhoVeiculo *cabVeiculo = carregaCabecalhoVeiculoDoBIN(arqVeic);
     CabecalhoLinha *cabLinha = carregaCabecalhoLinhaDoBIN(arqLinhas);
     NoCabecalhoAB *noCabAB= carregaNoCabecalhoDaAB(arqIndice);
+
+    //Verificando se algum cabecalho possui status incosistente
     if (cabLinha->status == '0' ||cabVeiculo->status == '0' || noCabAB->status == '0'){
+        free(cabLinha);
+        free(cabVeiculo);
+        free(noCabAB);
+        fclose(arqVeic);
+        fclose(arqLinhas);
+        fclose(arqIndice);
         imprimeMensagemErro(stdout);
         return;
     }
     
     int tevePrint =false;
 
+    //Loop unico no arquivo de veiculos
     while (!fimDoArquivoBIN(arqVeic)) {
         RegistroVeiculo *regVeiculo = carregaRegistroVeiculoDoBIN(arqVeic);
+
+        //Verificando se o veiculo não está logicamente removido
         if (regVeiculo->removido == '0'){
             free(regVeiculo);
             continue;
         }
+        //buscando no arquivo de indice
         long long offset = buscaRegistroDadosNaAB(arqIndice, noCabAB, regVeiculo->codLinha);
+
+        //impressão caso a busca tenha sucesso
         if (offset != VALOR_NULO){
             tevePrint = 1;
             fseek(arqLinhas, offset, SEEK_SET);
@@ -91,21 +145,27 @@ void juncaoArquivoIndice(char *nomeArqVeic, char *nomeArqLinhas, char *campoVeic
             linhaNaTela(regLinha, cabLinha);
             free(regLinha);
         }
-        fseek(arqIndice, 0, SEEK_SET);
         free(regVeiculo);
     }
+
+    //verificando se algum registro foi impresso
     if (!tevePrint){
         printf("Registro inexistente.");
     }
+
+    //Liberando a memória alocada
     free(cabLinha);
     free(cabVeiculo);
+    free(noCabAB);
+
+    //fechando os arquivos
     fclose(arqVeic);
     fclose(arqLinhas);
     fclose(arqIndice);
 }
 
 /*
-Descrição: um arquivo de dados de veículos a partir do campo de ordenação em memória primária
+Descrição: Ordena um arquivo de dados de veículos a partir do campo de ordenação em memória primária
 @param nomeArqDesordenado: nome do arquivo binário com os dados desordenados
 @param nomeArqOrdenado: nome do arquivo vazio que receberá os dados ordenados
 @param campoOrdenacao: campo a partir do qual a ordenação será feita (sempre "codLinha")
@@ -127,6 +187,9 @@ void ordenacaoVeiculos(char *nomeArqDesordenado, char *nomeArqOrdenado, char *ca
 
     // Abortando a funcionalidade se o arquivo desordenado estiver inconsistente:
     if (cabArqDesordenado->status == '0') {
+        fclose(arqDesordenado);
+        fclose(arqOrdenado);
+        free(cabArqDesordenado);
         imprimeMensagemErro(stdout);
         return;
     }
@@ -165,7 +228,7 @@ void ordenacaoVeiculos(char *nomeArqDesordenado, char *nomeArqOrdenado, char *ca
 }
 
 /*
-Descrição: um arquivo de dados de linhas a partir do campo de ordenação em memória primária
+Descrição: Ordena um arquivo de dados de linhas a partir do campo de ordenação em memória primária
 @param nomeArqDesordenado: nome do arquivo binário com os dados desordenados
 @param nomeArqOrdenado: nome do arquivo vazio que receberá os dados ordenados
 @param campoOrdenacao: campo a partir do qual a ordenação será feita (sempre "codLinha")
@@ -187,6 +250,9 @@ void ordenacaoLinhas(char *nomeArqDesordenado, char *nomeArqOrdenado, char *camp
 
     // Abortando a funcionalidade se o arquivo desordenado estiver inconsistente:
     if (cabArqDesordenado->status == '0') {
+        fclose(arqDesordenado);
+        fclose(arqOrdenado);
+        free(cabArqDesordenado);
         imprimeMensagemErro(stdout);
         return;
     }
@@ -249,6 +315,10 @@ void juncaoOrdenada(char *nomeArqVeic, char *nomeArqLinhas, char *campoVeiculo, 
 
     // Abortando a funcionalidade se algum arquivo estiver inconsistente:
     if (cabecalhoVeiculo->status == '0' || cabecalhoLinha->status == '0') {
+        free(cabecalhoLinha);
+        free(cabecalhoVeiculo);
+        fclose(arqLinhas);
+        fclose(arqVeiculos);
         imprimeMensagemErro(stdout);
         return;
     }
@@ -283,4 +353,6 @@ void juncaoOrdenada(char *nomeArqVeic, char *nomeArqLinhas, char *campoVeiculo, 
     // Liberando Memória Alocada:
     free(registrosVeiculos);
     free(registrosLinhas);
+    free(cabecalhoLinha);
+    free(cabecalhoVeiculo);
 }
