@@ -2,49 +2,57 @@
 
 
 void juncaoLoopUnico(char *nomeArqVeic, char *nomeArqLinhas, char *campoVeiculo, char *campoLinha) {
-    // FILE *arqVeic = fopen(nomeArqVeic, "r");
-    // FILE *arqLinhas = fopen(nomeArqLinhas, "r");
+    FILE *arqVeic = fopen(nomeArqVeic, "r");
+    FILE *arqLinhas = fopen(nomeArqLinhas, "r");
 
-    // // Abortando a funcionalidade se algum dos parâmetros for inválido:
-    // if (arqVeic == NULL || arqLinhas == NULL) {
-    //     imprimeMensagemErro(stdout);
-    //     return;
-    // }
+    // Abortando a funcionalidade se algum dos parâmetros for inválido:
+    if (arqVeic == NULL || arqLinhas == NULL || strcmp(campoLinha, "codLinha") || strcmp(campoVeiculo, "codLinha")) {
+        imprimeMensagemErro(stdout);
+        return;
+    }
 
-    // CabecalhoVeiculo *cabVeiculo = carregaCabecalhoVeiculoDoBIN(arqVeic);
-    // CabecalhoLinha *cabLinha = carregaCabecalhoLinhaDoBIN(arqLinhas);
-    // int tevePrint =false;
+    CabecalhoVeiculo *cabVeiculo = carregaCabecalhoVeiculoDoBIN(arqVeic);
+    CabecalhoLinha *cabLinha = carregaCabecalhoLinhaDoBIN(arqLinhas);
+    if (cabLinha->status == '0' ||cabVeiculo->status == '0'){
+        imprimeMensagemErro(stdout);
+        return;
+    }
+    int primeiroRegistro = ftell(arqLinhas);
+    int tevePrint =false;
 
-    // while (!fimDoArquivoBIN(arqVeic))
-    // {
-    //     RegistroVeiculo *regVeiculo = carregaRegistroVeiculoDoBIN(arqVeic);
-    //     if (regVeiculo->removido == '0'){
-    //         free(regVeiculo);
-    //         continue;
-    //     }
-    //     while (!fimDoArquivoBIN(arqLinhas))
-    //     {
-    //         RegistroLinha *regLinha = carregaRegistroLinhaDoBIN(arqLinhas);
-    //         if (compararRegistros(regLinha, regVeiculo)){
-    //             tevePrint =true;
-    //             veiculoNaTela(regVeiculo, cabVeiculo);
-    //             printf("\n");
-    //             linhaNaTela(regLinha, cabLinha);
-    //             printf("\n");
-    //         }
-    //         free(regLinha);
-    //     }
-    //     fseek(arqLinhas, 0, SEEK_SET);
-    //     free (regVeiculo);
-    // }
+    while (!fimDoArquivoBIN(arqVeic))
+    {
+        RegistroVeiculo *regVeiculo = carregaRegistroVeiculoDoBIN(arqVeic);
+        if (regVeiculo->removido == '0'){
+            free(regVeiculo);
+            continue;
+        }
+        while (!fimDoArquivoBIN(arqLinhas))
+        {
+            RegistroLinha *regLinha = carregaRegistroLinhaDoBIN(arqLinhas);
+            if (regLinha->removido == '0'){
+                free(regLinha);
+                continue;
+            }
+            if (regVeiculo->codLinha == regLinha->codLinha){
+                tevePrint =true;
+                veiculoNaTela(regVeiculo, cabVeiculo);
+                linhaNaTela(regLinha, cabLinha);
+                break;
+            }
+            free(regLinha);
+        }
+        fseek(arqLinhas, primeiroRegistro, SEEK_SET);
+        free (regVeiculo);
+    }
     
-    // if (!tevePrint){
-    //     printf("Registro inexistente");
-    // }
-    // free(cabLinha);
-    // free(cabVeiculo);
-    // fclose(arqVeic);
-    // fclose(arqLinhas);
+    if (!tevePrint){
+        printf("Registro inexistente.");
+    }
+    free(cabLinha);
+    free(cabVeiculo);
+    fclose(arqVeic);
+    fclose(arqLinhas);
 }
 
 void juncaoArquivoIndice(char *nomeArqVeic, char *nomeArqLinhas, char *campoVeiculo, char *campoLinha, char *nomeArqIndice) {
@@ -53,7 +61,7 @@ void juncaoArquivoIndice(char *nomeArqVeic, char *nomeArqLinhas, char *campoVeic
     FILE *arqIndice = fopen(nomeArqIndice, "r");
 
     // Abortando a funcionalidade se algum dos parâmetros for inválido:
-    if (arqVeic == NULL || arqLinhas == NULL) {
+    if (arqVeic == NULL || arqLinhas == NULL || strcmp(campoLinha, "codLinha") || strcmp(campoVeiculo, "codLinha")) {
         imprimeMensagemErro(stdout);
         return;
     }
@@ -61,6 +69,10 @@ void juncaoArquivoIndice(char *nomeArqVeic, char *nomeArqLinhas, char *campoVeic
     CabecalhoVeiculo *cabVeiculo = carregaCabecalhoVeiculoDoBIN(arqVeic);
     CabecalhoLinha *cabLinha = carregaCabecalhoLinhaDoBIN(arqLinhas);
     NoCabecalhoAB *noCabAB= carregaNoCabecalhoDaAB(arqIndice);
+    if (cabLinha->status == '0' ||cabVeiculo->status == '0' || noCabAB->status == '0'){
+        imprimeMensagemErro(stdout);
+        return;
+    }
     
     int tevePrint =false;
 
@@ -83,7 +95,7 @@ void juncaoArquivoIndice(char *nomeArqVeic, char *nomeArqLinhas, char *campoVeic
         free(regVeiculo);
     }
     if (!tevePrint){
-        printf("Registro inexistente");
+        printf("Registro inexistente.");
     }
     free(cabLinha);
     free(cabVeiculo);

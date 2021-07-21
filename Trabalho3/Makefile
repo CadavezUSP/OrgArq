@@ -1,6 +1,6 @@
 SRC = ./sources
 INC = ./includes
-EXE = trabalho2
+EXE = trabalho3
 FLAGS = -Wall -Werror -I
 
 all: compile
@@ -12,4 +12,4 @@ run:
 	@./$(EXE)
 
 zip:
-	@zip -r Trabalho2 $(SRC) $(INC) Makefile
+	@zip -r Trabalho3 $(SRC) $(INC) Makefile

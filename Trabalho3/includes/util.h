@@ -18,6 +18,5 @@
     void binarioNaTela(char *nomeArquivoBinario); 
     int comparVeiculos(const void *a, const void *b);
     int comparLinhas(const void *a, const void *b);
-    // int compararRegistros(RegistroLinha *linha, RegistroVeiculo *veiculo);
 
 #endif
