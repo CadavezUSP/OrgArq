@@ -3,15 +3,19 @@
 
 #include "util.h"
 
-
+/*
+Descrição: função de comparação da qsort para ordenação de veículos
+*/
 int comparVeiculos(const void *a, const void *b) {
     return (*(RegistroVeiculo **) a)->codLinha - (*(RegistroVeiculo **) b)->codLinha;
 }
 
+/*
+Descrição: função de comparação da qsort para ordenação de veículos
+*/
 int comparLinhas(const void *a, const void *b) {
     return (*(RegistroLinha **) a)->codLinha - (*(RegistroLinha **) b)->codLinha;
 }
-
 
 /*
 Descrição: obtém o mês do ano correspondente a partir de seu número

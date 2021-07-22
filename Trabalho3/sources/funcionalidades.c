@@ -95,9 +95,9 @@ Descrição: Realiza a junção de um arquivo binario veiculos e um arquivo bina
 void juncaoArquivoIndice(char *nomeArqVeic, char *nomeArqLinhas, char *campoVeiculo, char *campoLinha, char *nomeArqIndice) {
 
     //abrindo os arquivos
-    FILE *arqVeic = fopen(nomeArqVeic, "r");
-    FILE *arqLinhas = fopen(nomeArqLinhas, "r");
-    FILE *arqIndice = fopen(nomeArqIndice, "r");
+    FILE *arqVeic = fopen(nomeArqVeic, "rb");
+    FILE *arqLinhas = fopen(nomeArqLinhas, "rb");
+    FILE *arqIndice = fopen(nomeArqIndice, "rb");
 
     // Abortando a funcionalidade se algum dos parâmetros for inválido:
     if (arqVeic == NULL || arqLinhas == NULL || strcmp(campoLinha, "codLinha") || strcmp(campoVeiculo, "codLinha")) {
@@ -337,9 +337,9 @@ void juncaoOrdenada(char *nomeArqVeic, char *nomeArqLinhas, char *campoVeiculo, 
                 linhaNaTela(registrosLinhas[indiceLinhas], cabecalhoLinha);
                 houveJuncao = true;
             }
-            free(registrosVeiculos[indiceVeiculos++]);
+            indiceVeiculos++;
         }
-        free(registrosLinhas[indiceLinhas++]);
+        indiceLinhas++;
     }
 
     // Imprimindo alerta caso nenhuma junção tenha sido feita:
@@ -351,6 +351,10 @@ void juncaoOrdenada(char *nomeArqVeic, char *nomeArqLinhas, char *campoVeiculo, 
     fclose(arqLinhas);
 
     // Liberando Memória Alocada:
+    for (int i = 0; registrosVeiculos[i] != NULL; i++)
+        free(registrosVeiculos[i]);
+    for (int i = 0; registrosLinhas[i] != NULL; i++)
+        free(registrosLinhas[i]);
     free(registrosVeiculos);
     free(registrosLinhas);
     free(cabecalhoLinha);

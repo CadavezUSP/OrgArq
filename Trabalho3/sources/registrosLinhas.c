@@ -147,12 +147,14 @@ RegistroLinha **carregaVetorRegistrosLinhaOrdenadoDoBIN(FILE *arquivoBIN) {
 
     // Carregando todos os registros não removidos do arquivo desordenado para o vetor de registros:
     while (!fimDoArquivoBIN(arquivoBIN)) {
-        registrosLinha = realloc(registrosLinha, (nroRegistros + 1) * sizeof(RegistroLinha *));
         RegistroLinha *registroAtual = carregaRegistroLinhaDoBIN(arquivoBIN);
-        if (registroAtual->removido == '1')
+        if (registroAtual->removido == '1') {
+            registrosLinha = realloc(registrosLinha, (nroRegistros + 1) * sizeof(RegistroLinha *));
             registrosLinha[nroRegistros++] = registroAtual;
-        else
+        }
+        else {
             free(registroAtual);
+        }
     }
 
     // Ordenando o vetor de registros não removidos com a função qsort:

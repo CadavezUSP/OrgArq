@@ -165,12 +165,14 @@ RegistroVeiculo **carregaVetorRegistrosVeiculoOrdenadoDoBIN(FILE *arquivoBIN) {
 
     // Carregando todos os registros não removidos do arquivo desordenado para o vetor de registros:
     while (!fimDoArquivoBIN(arquivoBIN)) {
-        registrosVeiculo = realloc(registrosVeiculo, (nroRegistros + 1) * sizeof(RegistroVeiculo *));
         RegistroVeiculo *registroAtual = carregaRegistroVeiculoDoBIN(arquivoBIN);
-        if (registroAtual->removido == '1') // se o registro não for removido
+        if (registroAtual->removido == '1') { // se o registro não for removido
+            registrosVeiculo = realloc(registrosVeiculo, (nroRegistros + 1) * sizeof(RegistroVeiculo *));
             registrosVeiculo[nroRegistros++] = registroAtual;
-        else
+        }
+        else {
             free(registroAtual);
+        }
     }
 
     // Ordenando o vetor de registros não removidos com a função qsort:
