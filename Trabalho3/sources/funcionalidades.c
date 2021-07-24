@@ -193,6 +193,12 @@ void ordenacaoVeiculos(char *nomeArqDesordenado, char *nomeArqOrdenado, char *ca
         imprimeMensagemErro(stdout);
         return;
     }
+    if (strcmp(campoOrdenacao, "codLinha")) {
+        fclose(arqOrdenado);
+        fclose(arqDesordenado);
+        imprimeMensagemErro(stdout);
+        return;
+    }
 
     // Inicializando um registro de cabeçalho para o arquivo ordenado:
     CabecalhoVeiculo *cabArqOrdenado = inicializaCabecalhoVeiculo();
@@ -241,6 +247,12 @@ void ordenacaoLinhas(char *nomeArqDesordenado, char *nomeArqOrdenado, char *camp
 
     // Abortando a funcionalidade se algum dos parâmetros for inválido:
     if (arqDesordenado == NULL || arqOrdenado == NULL || strcmp(campoOrdenacao, "codLinha")) {
+        imprimeMensagemErro(stdout);
+        return;
+    }
+    if (strcmp(campoOrdenacao, "codLinha")) {
+        fclose(arqOrdenado);
+        fclose(arqDesordenado);
         imprimeMensagemErro(stdout);
         return;
     }
@@ -304,7 +316,13 @@ void juncaoOrdenada(char *nomeArqVeic, char *nomeArqLinhas, char *campoVeiculo, 
     FILE *arqLinhas = fopen(nomeArqLinhas, "rb");
 
     // Abortando a funcionalidade se algum dos parâmetros for inválido:
-    if (arqVeiculos == NULL || arqLinhas == NULL || strcmp(campoVeiculo, "codLinha") || strcmp(campoLinha, "codLinha")) {
+    if (arqVeiculos == NULL || arqLinhas == NULL) {
+        imprimeMensagemErro(stdout);
+        return;
+    }
+    if (strcmp(campoVeiculo, "codLinha") || strcmp(campoLinha, "codLinha")) {
+        fclose(arqLinhas);
+        fclose(arqVeiculos);
         imprimeMensagemErro(stdout);
         return;
     }
