@@ -11,8 +11,14 @@ void juncaoLoopUnico(char *nomeArqVeic, char *nomeArqLinhas, char *campoVeiculo,
     FILE *arqVeic = fopen(nomeArqVeic, "r");
     FILE *arqLinhas = fopen(nomeArqLinhas, "r");
 
+    if (arqVeic == NULL || arqLinhas == NULL){
     // Abortando a funcionalidade se algum dos parâmetros for inválido:
-    if (arqVeic == NULL || arqLinhas == NULL || strcmp(campoLinha, "codLinha") || strcmp(campoVeiculo, "codLinha")) {
+        imprimeMensagemErro(stdout);
+        return;
+    }
+    if (strcmp(campoLinha, "codLinha") || strcmp(campoVeiculo, "codLinha")) {
+        fclose(arqVeic);
+        fclose(arqLinhas);
         imprimeMensagemErro(stdout);
         return;
     }
@@ -30,7 +36,7 @@ void juncaoLoopUnico(char *nomeArqVeic, char *nomeArqLinhas, char *campoVeiculo,
         fclose(arqLinhas);
         return;
     }
-    int primeiroRegistro = ftell(arqLinhas);
+    long primeiroRegistro = ftell(arqLinhas);
     int tevePrint =false;
 
     //loop para percorrer arquivo de veiculos até o fim
@@ -100,7 +106,14 @@ void juncaoArquivoIndice(char *nomeArqVeic, char *nomeArqLinhas, char *campoVeic
     FILE *arqIndice = fopen(nomeArqIndice, "rb");
 
     // Abortando a funcionalidade se algum dos parâmetros for inválido:
-    if (arqVeic == NULL || arqLinhas == NULL || strcmp(campoLinha, "codLinha") || strcmp(campoVeiculo, "codLinha")) {
+    if (arqVeic == NULL || arqLinhas == NULL){ 
+        imprimeMensagemErro(stdout);
+        return;
+    }
+    if (strcmp(campoLinha, "codLinha") || strcmp(campoVeiculo, "codLinha")) {
+        fclose(arqVeic);
+        fclose(arqLinhas);
+        fclose(arqIndice);
         imprimeMensagemErro(stdout);
         return;
     }
