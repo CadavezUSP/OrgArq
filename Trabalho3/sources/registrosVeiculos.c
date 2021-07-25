@@ -86,6 +86,22 @@ void escreveRegistroVeiculoNoBIN(RegistroVeiculo *registroVeiculo, FILE *arquivo
 }
 
 /*
+Descrição: Escreve os dados de um vetor de ponteiros para estruturas de RegistroVeiculo ordenados em um arquivo binário
+@param arquivoBIN: fluxo do arquivo binário em que os dados serão escritos
+@param registroVeiculo: ponteiro para a região de memória onde o vetor de registros de dados está armazenado 
+@param cabecalho: cabeçalho referente ao arquivoBIN
+*/
+void escreveVetorRegistrosVeiculoOrdenadoNoBIN(FILE *arquivoBIN, RegistroVeiculo **registrosVeiculo, CabecalhoVeiculo *cabecalho) {
+    // Escrevendo os registros ordenados, um a um:
+    for (int i = 0; registrosVeiculo[i] != NULL; i++) {
+        escreveRegistroVeiculoNoBIN(registrosVeiculo[i], arquivoBIN);
+        cabecalho->nroRegistros += 1;
+        cabecalho->byteProxReg = ftell(arquivoBIN);
+        free(registrosVeiculo[i]);
+    }
+}
+
+/*
 Descrição: Aloca memória e preenche dados uma estrutura do tipo CabecalhoVeiculo a partir de um arquivo binário 
 @param arquivoBIN: fluxo do arquivo binário de onde as informações do registro de cabeçalho serão extraídas
 @return CabecalhoVeiculo* ponteiro para a região de memória em que os dados foram armazenados 

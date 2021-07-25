@@ -190,7 +190,13 @@ void ordenacaoVeiculos(char *nomeArqDesordenado, char *nomeArqOrdenado, char *ca
     FILE *arqOrdenado = fopen(nomeArqOrdenado, "w+b");
 
     // Abortando a funcionalidade se algum dos parâmetros for inválido:
-    if (arqDesordenado == NULL || arqOrdenado == NULL || strcmp(campoOrdenacao, "codLinha")) {
+    if (arqDesordenado == NULL || arqOrdenado == NULL) {
+        imprimeMensagemErro(stdout);
+        return;
+    }
+    if (strcmp(campoOrdenacao, "codLinha")) {
+        fclose(arqOrdenado);
+        fclose(arqDesordenado);
         imprimeMensagemErro(stdout);
         return;
     }
@@ -206,12 +212,6 @@ void ordenacaoVeiculos(char *nomeArqDesordenado, char *nomeArqOrdenado, char *ca
         imprimeMensagemErro(stdout);
         return;
     }
-    if (strcmp(campoOrdenacao, "codLinha")) {
-        fclose(arqOrdenado);
-        fclose(arqDesordenado);
-        imprimeMensagemErro(stdout);
-        return;
-    }
 
     // Inicializando um registro de cabeçalho para o arquivo ordenado:
     CabecalhoVeiculo *cabArqOrdenado = inicializaCabecalhoVeiculo();
@@ -222,12 +222,7 @@ void ordenacaoVeiculos(char *nomeArqDesordenado, char *nomeArqOrdenado, char *ca
     RegistroVeiculo **registrosVeiculo = carregaVetorRegistrosVeiculoOrdenadoDoBIN(arqDesordenado);
 
     // Escrevendo os registros ordenados no novo arquivo:
-    for (int i = 0; registrosVeiculo[i] != NULL; i++) {
-        escreveRegistroVeiculoNoBIN(registrosVeiculo[i], arqOrdenado);
-        cabArqOrdenado->nroRegistros += 1;
-        cabArqOrdenado->byteProxReg = ftell(arqOrdenado);
-        free(registrosVeiculo[i]);
-    }
+    escreveVetorRegistrosVeiculoOrdenadoNoBIN(arqOrdenado, registrosVeiculo, cabArqOrdenado);
 
     // Atualizando o registro de cabeçalho do arquivo ordenado:
     cabArqOrdenado->status = '1';
@@ -259,7 +254,7 @@ void ordenacaoLinhas(char *nomeArqDesordenado, char *nomeArqOrdenado, char *camp
     FILE *arqOrdenado = fopen(nomeArqOrdenado, "w+b");
 
     // Abortando a funcionalidade se algum dos parâmetros for inválido:
-    if (arqDesordenado == NULL || arqOrdenado == NULL || strcmp(campoOrdenacao, "codLinha")) {
+    if (arqDesordenado == NULL || arqOrdenado == NULL) {
         imprimeMensagemErro(stdout);
         return;
     }
@@ -291,12 +286,7 @@ void ordenacaoLinhas(char *nomeArqDesordenado, char *nomeArqOrdenado, char *camp
     RegistroLinha **registrosLinha = carregaVetorRegistrosLinhaOrdenadoDoBIN(arqDesordenado);
 
     // Escrevendo os registros ordenados no novo arquivo:
-    for (int i = 0; registrosLinha[i] != NULL; i++) {
-        escreveRegistroLinhaNoBIN(registrosLinha[i], arqOrdenado);
-        cabArqOrdenado->nroRegistros += 1;
-        cabArqOrdenado->byteProxReg = ftell(arqOrdenado);
-        free(registrosLinha[i]);
-    }
+    escreveVetorRegistrosLinhaOrdenadoNoBIN(arqOrdenado, registrosLinha, cabArqOrdenado);
 
     // Atualizando o registro de cabeçalho do arquivo ordenado:
     cabArqOrdenado->status = '1';
@@ -377,15 +367,19 @@ void juncaoOrdenada(char *nomeArqVeic, char *nomeArqLinhas, char *campoVeiculo, 
     if (!houveJuncao)
         printf("Registro inexistente.");
 
+    // Re-inserindo os registros, agora ordenados, nos arquivos:
+    CabecalhoVeiculo *cabVeiculoOrdenado = inicializaCabecalhoVeiculo();
+    CabecalhoLinha *cabLinhaOrdenado = inicializaCabecalhoLinha();
+    copiaDescricoesCabecalhoVeiculo(cabecalhoVeiculo, cabVeiculoOrdenado);
+    copiaDescricoesCabecalhoLinha(cabecalhoLinha, cabLinhaOrdenado);
+    escreveVetorRegistrosVeiculoOrdenadoNoBIN(arqVeiculos, registrosVeiculos, cabVeiculoOrdenado);
+    escreveVetorRegistrosLinhaOrdenadoNoBIN(arqLinhas, registrosLinhas, cabLinhaOrdenado);
+
     // Fechando os arquivos:
     fclose(arqVeiculos);
     fclose(arqLinhas);
 
     // Liberando Memória Alocada:
-    for (int i = 0; registrosVeiculos[i] != NULL; i++)
-        free(registrosVeiculos[i]);
-    for (int i = 0; registrosLinhas[i] != NULL; i++)
-        free(registrosLinhas[i]);
     free(registrosVeiculos);
     free(registrosLinhas);
     free(cabecalhoLinha);

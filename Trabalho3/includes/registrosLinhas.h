@@ -40,6 +40,7 @@
     void copiaDescricoesCabecalhoLinha(CabecalhoLinha *cabecalhoOriginal, CabecalhoLinha *cabecalhoCopia);
     void escreveCabecalhoLinhaNoBIN(CabecalhoLinha *cabecalho, FILE *arquivoBIN);
     void escreveRegistroLinhaNoBIN(RegistroLinha *registroLinha, FILE *arquivoBIN); 
+    void escreveVetorRegistrosLinhaOrdenadoNoBIN(FILE *arquivoBIN, RegistroLinha **registrosLinha, CabecalhoLinha *cabeclho);
     void linhaNaTela (RegistroLinha *Reg, CabecalhoLinha *cabecalho);
 
 #endif

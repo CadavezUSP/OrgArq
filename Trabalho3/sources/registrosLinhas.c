@@ -76,6 +76,22 @@ void escreveRegistroLinhaNoBIN(RegistroLinha *registroLinha, FILE *arquivoBIN) {
 }
 
 /*
+Descrição: Escreve os dados de um vetor de ponteiros para estruturas de RegistroLinha ordenados em um arquivo binário
+@param arquivoBIN: fluxo do arquivo binário em que os dados serão escritos
+@param registrosLinha: ponteiro para a região de memória onde o vetor de registros de dados está armazenado 
+@param cabecalho: cabeçalho referente ao arquivoBIN
+*/
+void escreveVetorRegistrosLinhaOrdenadoNoBIN(FILE *arquivoBIN, RegistroLinha **registrosLinha, CabecalhoLinha *cabeclho) {
+    // Escrevendo os registros ordenados, um a um:
+    for (int i = 0; registrosLinha[i] != NULL; i++) {
+        escreveRegistroLinhaNoBIN(registrosLinha[i], arquivoBIN);
+        cabeclho->nroRegistros += 1;
+        cabeclho->byteProxReg = ftell(arquivoBIN);
+        free(registrosLinha[i]);
+    }
+}
+
+/*
 Descrição: Aloca memória e preenche dados uma estrutura do tipo CabecalhoLinha a partir de um arquivo binário 
 @param arquivoBIN: fluxo do arquivo binário de onde as informações do registro de cabeçalho serão extraídas
 @return CabecalhoLinha* ponteiro para a região de memória em que os dados foram armazenados 

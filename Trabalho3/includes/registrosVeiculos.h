@@ -44,6 +44,7 @@
     void copiaDescricoesCabecalhoVeiculo(CabecalhoVeiculo *cabecalhoOriginal, CabecalhoVeiculo *cabecalhoCopia);
     void escreveCabecalhoVeiculoNoBIN(CabecalhoVeiculo *cabecalho, FILE *arquivoBIN);
     void escreveRegistroVeiculoNoBIN(RegistroVeiculo *registroVeiculo, FILE *arquivoBIN); 
+    void escreveVetorRegistrosVeiculoOrdenadoNoBIN(FILE *arquivoBIN, RegistroVeiculo **registrosVeiculo, CabecalhoVeiculo *cabeclho);
     void veiculoNaTela (RegistroVeiculo *Reg, CabecalhoVeiculo *cabecalho);
 
 #endif
